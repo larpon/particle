@@ -32,8 +32,8 @@ pub fn (v1 Vec2) + (v2 Vec2) Vec2 {
     return Vec2{v1.x + v2.x, v1.y + v2.y}
 }
 
-pub fn (v Vec2) add(vector Vec2) Vec2 {
-    return Vec2{ v.x + vector.x, v.y + vector.y }
+pub fn (v Vec2) add(u Vec2) Vec2 {
+    return Vec2{ v.x + u.x, v.y + u.y }
 }
 
 pub fn (v Vec2) add_f64(scalar f64) Vec2 {
@@ -44,9 +44,9 @@ pub fn (v Vec2) add_f32(scalar f32) Vec2 {
     return Vec2{ v.x + scalar, v.y + scalar }
 }
 
-pub fn (mut v Vec2) plus(vector Vec2) {
-    v.x += vector.x
-    v.y += vector.y
+pub fn (mut v Vec2) plus(u Vec2) {
+    v.x += u.x
+    v.y += u.y
 }
 
 pub fn (mut v Vec2) plus_f64(scalar f64) {
@@ -59,7 +59,6 @@ pub fn (mut v Vec2) plus_f32(scalar f32) {
     v.y += scalar
 }
 
-
 //
 // Subtraction
 //
@@ -67,17 +66,17 @@ pub fn (v1 Vec2) - (v2 Vec2) Vec2 {
     return Vec2{v1.x - v2.x, v1.y - v2.y}
 }
 
-pub fn (v Vec2) sub(vector Vec2) Vec2 {
-    return Vec2{ v.x - vector.x, v.y - vector.y }
+pub fn (v Vec2) sub(u Vec2) Vec2 {
+    return Vec2{ v.x - u.x, v.y - u.y }
 }
 
 pub fn (v Vec2) sub_f64(scalar f64) Vec2 {
     return Vec2{ v.x - scalar, v.y - scalar }
 }
 
-pub fn (mut v Vec2) subtract(vector Vec2) {
-    v.x -= vector.x
-    v.y -= vector.y
+pub fn (mut v Vec2) subtract(u Vec2) {
+    v.x -= u.x
+    v.y -= u.y
 }
 
 pub fn (mut v Vec2) subtract_f64(scalar f64) {
@@ -93,17 +92,17 @@ pub fn (v1 Vec2) * (v2 Vec2) Vec2 {
 }
 
 
-pub fn (v Vec2) mul(vector Vec2) Vec2 {
-    return Vec2{ v.x * vector.x, v.y * vector.y }
+pub fn (v Vec2) mul(u Vec2) Vec2 {
+    return Vec2{ v.x * u.x, v.y * u.y }
 }
 
 pub fn (v Vec2) mul_f64(scalar f64) Vec2 {
     return Vec2{ v.x * scalar, v.y * scalar }
 }
 
-pub fn (mut v Vec2) multiply(vector Vec2) {
-    v.x *= vector.x
-    v.y *= vector.y
+pub fn (mut v Vec2) multiply(u Vec2) {
+    v.x *= u.x
+    v.y *= u.y
 }
 
 pub fn (mut v Vec2) multiply_f64(scalar f64) {
@@ -118,17 +117,17 @@ pub fn (v1 Vec2) / (v2 Vec2) Vec2 {
     return Vec2{v1.x / v2.x, v1.y / v2.y}
 }
 
-pub fn (v Vec2) div(vector Vec2) Vec2 {
-    return Vec2{ v.x / vector.x, v.y / vector.y }
+pub fn (v Vec2) div(u Vec2) Vec2 {
+    return Vec2{ v.x / u.x, v.y / u.y }
 }
 
 pub fn (v Vec2) div_f64(scalar f64) Vec2 {
     return Vec2{ v.x / scalar, v.y / scalar }
 }
 
-pub fn (mut v Vec2) divide(vector Vec2) {
-    v.x /= vector.x
-    v.y /= vector.y
+pub fn (mut v Vec2) divide(u Vec2) {
+    v.x /= u.x
+    v.y /= u.y
 }
 
 pub fn (mut v Vec2) divide_f64(scalar f64) {
@@ -144,14 +143,16 @@ pub fn (v Vec2) length() f64 {
     return math.sqrt((v.x*v.x) + (v.y*v.y))
 }
 
-pub fn (v Vec2) dot(vector Vec2) f64 {
-    return (v.x * vector.x) + (v.y*vector.y)
+pub fn (v Vec2) dot(u Vec2) f64 {
+    return (v.x * u.x) + (v.y*u.y)
 }
 
-pub fn (v Vec2) cross(vector Vec2) f64 {
-    return (v.x * vector.y) - (v.y*vector.x)
+// cross returns the cross product of v and u
+pub fn (v Vec2) cross(u Vec2) f64 {
+    return (v.x * u.y) - (v.y*u.x)
 }
 
+// unit return this vector's unit vector
 pub fn (v Vec2) unit() Vec2 {
     length := v.length()
     return Vec2{ v.x/length, v.y/length }
@@ -161,34 +162,37 @@ pub fn (v Vec2) perp() Vec2 {
     return Vec2{ -v.y, v.x }
 }
 
-pub fn (v Vec2) perpendicular(vector Vec2) Vec2 {
-    return v - v.project(vector)
+// perpendicular return the perpendicular vector of this
+pub fn (v Vec2) perpendicular(u Vec2) Vec2 {
+    return v - v.project(u)
 }
 
-pub fn (v Vec2) project(vector Vec2) Vec2 {
-    percent := v.dot(vector) / vector.dot(v)
-    return vector.mul_f64(percent)
+// project returns the projected vector
+pub fn (v Vec2) project(u Vec2) Vec2 {
+    percent := v.dot(u) / u.dot(v)
+    return u.mul_f64(percent)
 }
 
 // eq returns a bool indicating if the two vectors are equal
-pub fn (v Vec2) eq(vector Vec2) bool {
-    return v.x == vector.x && v.y == vector.y
+pub fn (v Vec2) eq(u Vec2) bool {
+    return v.x == u.x && v.y == u.y
 }
 
 // eq_epsilon returns a bool indicating if the two vectors are equal within epsilon
-pub fn (v Vec2) eq_epsilon(vector Vec2) bool {
-    return v.x.eq_epsilon(vector.x) && v.y.eq_epsilon(vector.y)
+pub fn (v Vec2) eq_epsilon(u Vec2) bool {
+    return v.x.eq_epsilon(u.x) && v.y.eq_epsilon(u.y)
 }
 
-pub fn (v Vec2) eq_approx(vector Vec2, tolerance f64) bool {
-	diff_x := math.fabs(v.x - vector.x)
-	diff_y := math.fabs(v.y - vector.y)
+// eq_approx will return a bool indicating if vectors are approximately equal within the tolerance
+pub fn (v Vec2) eq_approx(u Vec2, tolerance f64) bool {
+	diff_x := math.fabs(v.x - u.x)
+	diff_y := math.fabs(v.y - u.y)
 	if diff_x <= tolerance && diff_y <= tolerance {
 		return true
 	}
 
-	max_x := math.max(math.fabs(v.x), math.fabs(vector.x))
-	max_y := math.max(math.fabs(v.y), math.fabs(vector.y))
+	max_x := math.max(math.fabs(v.x), math.fabs(u.x))
+	max_y := math.max(math.fabs(v.y), math.fabs(u.y))
 	if diff_x < max_x * tolerance && diff_y < max_y * tolerance {
 		return true
 	}
@@ -196,6 +200,7 @@ pub fn (v Vec2) eq_approx(vector Vec2, tolerance f64) bool {
 	return false
 }
 
+// is_approx_zero will return a bool indicating if this vector is zero within tolerance
 pub fn (v Vec2) is_approx_zero(tolerance f64) bool {
 	if math.fabs(v.x) <= tolerance && math.fabs(v.y) <= tolerance {
 		return true
@@ -214,18 +219,18 @@ pub fn (v Vec2) eq_f32(scalar f32) bool {
 }
 
 // distance returns the distance between the two vectors
-pub fn (v Vec2) distance(vector Vec2) f64 {
-    return math.sqrt( (v.x-vector.x) * (v.x-vector.x) + (v.y-vector.y) * (v.y-vector.y) )
+pub fn (v Vec2) distance(u Vec2) f64 {
+    return math.sqrt( (v.x-u.x) * (v.x-u.x) + (v.y-u.y) * (v.y-u.y) )
 }
 
 // manhattan_distance returns the Manhattan distance between the two vectors
-pub fn (v Vec2) manhattan_distance(vector Vec2) f64 {
-    return math.fabs(v.x-vector.x) + math.fabs(v.y-vector.y)
+pub fn (v Vec2) manhattan_distance(u Vec2) f64 {
+    return math.fabs(v.x-u.x) + math.fabs(v.y-u.y)
 }
 
 // angle_between returns the angle in radians between the two vectors
-pub fn (v Vec2) angle_between(vector Vec2) f64 {
-    return math.atan2( (v.y-vector.y), (v.x-vector.x) )
+pub fn (v Vec2) angle_between(u Vec2) f64 {
+    return math.atan2( (v.y-u.y), (v.x-u.x) )
 }
 
 // angle returns the angle in radians of the vector
