@@ -68,7 +68,7 @@ fn (mut a App) init() {
 
 	vwhdiv6 := vec.Vec2{f64(a.width)/6,f64(a.height)/6}
 	e1 := particle.Emitter{
-		//enabled: true
+		enabled: true
 		position: vwhdiv6
 		rate: 10
 		velocity: particle.PointDirection{
@@ -83,7 +83,7 @@ fn (mut a App) init() {
 	a.ps.add(e1)
 
 	e2 := particle.Emitter{
-		//enabled: true
+		enabled: true
 		position: vec.Vec2{vwhdiv6.x*2,vwhdiv6.y}
 		rate: 4.5
 		velocity: particle.AngleDirection{
@@ -104,7 +104,7 @@ fn (mut a App) init() {
 	a.ps.add(e2)
 
 	e3 := particle.Emitter{
-		//enabled: true
+		enabled: true
 		position: vec.Vec2{vwhdiv6.x*3,vwhdiv6.y}
 		rate: 4.5
 		velocity: particle.TargetDirection {
@@ -112,14 +112,12 @@ fn (mut a App) init() {
 			target_variation:		vec.Vec2{0.5,0.5}
 			magnitude:				5
 			magnitude_variation:	2
-			//proportional_magnitude:	true
 		}
 		acceleration: particle.TargetDirection {
 			target:					bottom_right
 			target_variation:		vec.Vec2{bottom_right.x*0.2,bottom_right.y*0.2}
 			magnitude:				5
 			magnitude_variation:	0.5
-			//proportional_magnitude: true
 		}
 		life_time: 2000
 		life_time_variation: 1000
@@ -170,24 +168,13 @@ fn (mut a App) draw() {
 fn init(user_data voidptr) {
 	mut app := &App(user_data)
 
-	desc := C.sg_desc{
-		/*mtl_device: sapp.metal_get_device()
-		mtl_renderpass_descriptor_cb: sapp.metal_get_renderpass_descriptor
-		mtl_drawable_cb: sapp.metal_get_drawable
-		d3d11_device: sapp.d3d11_get_device()
-		d3d11_device_context: sapp.d3d11_get_device_context()
-		d3d11_render_target_view_cb: sapp.d3d11_get_render_target_view
-		d3d11_depth_stencil_view_cb: sapp.d3d11_get_depth_stencil_view*/
-	}
+	desc := C.sg_desc{}
 
 	gfx.setup(&desc)
 
 	sgl_desc := C.sgl_desc_t {
 		max_vertices: 4*65536
 		max_commands: 2*16384
-		//color_format: gfx.PixelFormat.rgba32f // C.sg_pixel_format( C.SG_PIXELFORMAT_RGBA32F )
-		//color_format: .rgba32f
-		//depth_format: .rgba32f
 	}
 	sgl.setup(&sgl_desc)
 
@@ -199,9 +186,6 @@ fn init(user_data voidptr) {
 	pipdesc.blend.src_factor_rgb = C.SG_BLENDFACTOR_SRC_ALPHA
 	pipdesc.blend.dst_factor_rgb = C.SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA
 	app.alpha_pip = sgl.make_pipeline(&pipdesc)
-
-	//gfx C.sg_query_pipeline_defaults
-	//sgl.default_pipeline
 }
 
 fn frame(user_data voidptr) {
