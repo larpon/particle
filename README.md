@@ -35,6 +35,8 @@ mut:
 	width		int
 	height		int
 
+	last		i64
+
 	ps			&particle.System = 0
 	alpha_pip	C.sgl_pipeline
 }
@@ -208,7 +210,8 @@ fn frame(user_data voidptr) {
 	app.width = sapp.width()
 	app.height = sapp.height()
   
-	dt := f64(time.ticks() - app.last) / 1000.0
+	t := time.ticks()
+	dt := f64(t - app.last) / 1000.0
 
 	sgl.default_pipeline()
 
@@ -221,6 +224,8 @@ fn frame(user_data voidptr) {
 
 	gfx.end_pass()
 	gfx.commit()
+
+	app.last = t
 }
 
 fn event(ev &C.sapp_event, user_data voidptr) {
