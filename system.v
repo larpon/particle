@@ -3,12 +3,7 @@
 
 module particle
 
-import particle.vec
-import rand
-
-import sokol.sgl
-
-type Component = Emitter | RectPainter // TODO
+type Component = Emitter | RectPainter | ImagePainter // TODO
 
 // System
 pub struct SystemConfig {
@@ -22,38 +17,53 @@ mut:
 	pool			[]&Particle
 	bin				[]&Particle
 
-	image_cache		[]Image
+	image_cache		map[string]Image
 
 	emitters		[]Emitter
 	painters		[]Painter
-//	tmp_rot f32
 }
 
 pub fn (mut s System) init(sc SystemConfig) {
 	$if debug {
-		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' creating $sc.pool particles')
+		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' creating $sc.pool particles.')
 	}
 	for i := 0; i < sc.pool; i++ {
-		p := particle.new_particle( s )
+		p := s.new_particle()
 		s.bin << p
 	}
 	$if debug {
-		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' created $sc.pool particles')
+		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' created $sc.pool particles.')
+	}
+
+	if s.painters.len == 0 {
+		$if debug {
+			eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' adding default painter.')
+		}
+		s.add(RectPainter{
+			groups: [""]
+			color: particle.default_color
+		})
 	}
 }
 
 pub fn (mut s System) add(c Component) {
-	//e.system = s
-	//println('Adding something')
-	match c {
+	//eprintln('Adding something')
+	match mut c {
 		Emitter {
 			eprintln('Adding emitter')
 			//e := c as Emitter
+			c.system = s
 			s.emitters << c
 		}
 		RectPainter {
-			eprintln('Adding painter')
+			eprintln('Adding rectangle painter')
 			//e := c as Emitter
+			s.painters << c
+		}
+		ImagePainter {
+			eprintln('Adding image painter')
+			//e := c as Emitter
+			//c.system = s
 			s.painters << c
 		}
 		/*
@@ -68,18 +78,53 @@ pub fn (mut s System) get_emitter(index int) &Emitter {
 	return &s.emitters[index]
 }
 
+pub fn (mut s System) get_emitters(groups []string) []&Emitter {
+	mut collected := []&Emitter{}
+	for i := 0; i < s.emitters.len; i++ {
+		emitter := &s.emitters[i]
+		for group in groups {
+			if emitter.group == group {
+				collected << emitter
+			}
+		}
+	}
+	return collected
+}
+
 pub fn (mut s System) update(dt f64) {
 	/*if dt == 0.0 {
 		dt = 0.000001
 	}*/
 
 	for i := 0; i < s.emitters.len; i++ {
-		s.emitters[i].update(mut s, dt)
+		s.emitters[i].update(dt)
 	}
 
 	mut p := &Particle(0)
 	for i := 0; i < s.pool.len; i++ {
 		p = s.pool[i]
+
+		if p.init.eq(p) {
+			for mut painter in s.painters {
+				match mut painter {
+					RectPainter {
+						if p.group in painter.groups {
+							painter.init(mut p)
+						}
+					}
+					ImagePainter {
+						if p.group in painter.groups {
+							painter.init(mut p)
+						}
+					}
+					else {
+						//eprintln('Painter type ${painter} not supported') // <- struct printing results in some C error
+						eprintln('Painter type init not needed')
+					}
+				}
+			}
+		}
+
 		p.update(dt)
 		if p.is_dead() {
 			s.bin << p
@@ -93,54 +138,34 @@ pub fn (mut s System) update(dt f64) {
 
 pub fn (mut s System) draw() {
 
-	//sgl.push_matrix()
-
-		/*
-		s.tmp_rot += 0.016*4
-
-		sgl.translate(f32(s.width)*0.5, f32(s.height)*0.5, 0)
-		sgl.rotate(sgl.rad(s.tmp_rot), 0, 0, 1)
-		sgl.translate(-f32(s.width)*0.5, -f32(s.height)*0.5, 0)
-
-		sgl.translate(f32(s.width)*0.5, f32(s.height)*0.5, 0)
-		sgl.scale(0.5, 0.5, 1)
-		sgl.translate(-f32(s.width)*0.5, -f32(s.height)*0.5, 0)
-
-		sgl.c4f(0.2, 0.1, 0.5, 0.1)
-		sgl.begin_quads()
-		sgl.v2f(0, 0)
-		sgl.v2f(0 + f32(s.width), 0)
-		sgl.v2f(0 + f32(s.width), 0 + f32(s.height))
-		sgl.v2f(0, 0 + f32(s.height))
-		sgl.end()
-		*/
-
-	/**/
-
 	mut p := &Particle(0)
 	//for mut p in s.pool {
 	for i := 0; i < s.pool.len; i++ {
 		p = s.pool[i]
-		if p.life_time <= 0 {
+		if p.is_dead() || !p.is_ready() {
 			continue
 		}
 
-		for painter in s.painters {
-			match painter {
+		for mut painter in s.painters {
+			match mut painter {
 				RectPainter {
 					if p.group in painter.groups {
 						painter.draw(mut p)
 					}
 				}
+				ImagePainter {
+					if p.group in painter.groups {
+						painter.draw(mut p)
+					}
+				}
 				else {
-					eprintln('Painter type ${painter} not supported')
+					//eprintln('Painter type ${painter} not supported') // <- struct printing results in some C error
+					eprintln('Painter type not supported')
 				}
 			}
 		}
-		//p.draw()
 	}
 
-	//sgl.pop_matrix()
 }
 
 pub fn (mut s System) reset() {
@@ -162,6 +187,12 @@ pub fn (mut s System) reset() {
 
 pub fn (mut s System) free() {
 
+	for key, image in s.image_cache {
+		eprintln('Freeing ${key} from image cache')
+		mut im := image
+		im.free()
+	}
+
 	eprintln('Freeing ${s.pool.len} from pool')
 	for p in s.pool {
 
@@ -171,7 +202,6 @@ pub fn (mut s System) free() {
 		}
 
 		unsafe{
-			//println('Freeing from bin')
 			p.free()
 		}
 	}

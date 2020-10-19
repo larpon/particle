@@ -6,21 +6,9 @@ module particle
 import math
 import rand
 
-import strconv
-
 import particle.vec
 
 pub struct Emitter {
-mut:
-	position_last_frame	vec.Vec2
-
-	system				&System = 0
-	dt					f64			// current delta time this frame
-	elapsed				f32			// Elapsed time accumulator
-
-	burst_position		vec.Vec2	// Center position of the burst
-	burst_amount		int
-	pulse_duration		int
 pub mut:
 	enabled				bool
 
@@ -30,16 +18,17 @@ pub mut:
 	velocity			StochasticDirection
 	acceleration		StochasticDirection
 
-	size_start			vec.Vec2 = default_size	// Emitted particles start their life in this size
-	size_end			vec.Vec2	// Emitted particles end their life in this size
-	size_variation		f32			// Particle size will vary up/down to a maximum of this value
+	start_size			vec.Vec2 = default_size	// Emitted particles start their life in this size
+	end_size			vec.Vec2	// Emitted particles end their life in this size
+	size_variation		vec.Vec2	// Particle size will vary up/down to a maximum of this value
+	emit_size_keep_aspect	bool = true
 
 	life_time			f32 = 1000	// How long the particles emitted will last
 	life_time_variation	f32			// Particle life time will vary up/down to a maximum of this value
 
 	rate				f32 = 10.0	// Particles emitted per second
 
-	group				string		// Logical group the particles belongs to
+	group				string		// Logical group the emitted particles belong to
 
 	shape				Shape		// TODO
 
@@ -50,6 +39,16 @@ pub mut:
 	*/
 	movement_velocity		f32
 	movement_velocity_flip	bool
+mut:
+	position_last_frame	vec.Vec2
+
+	system				&System = 0
+	dt					f64			// current delta time this frame
+	elapsed				f32			// Elapsed time accumulator
+
+	burst_position		vec.Vec2	// Center position of the burst
+	burst_amount		int
+	pulse_duration		int
 }
 
 /*
@@ -70,9 +69,8 @@ pub fn (mut e Emitter) pulse(duration_ms int) {
 	e.pulse_duration = duration_ms
 }
 
-pub fn (mut e Emitter) update(mut s &System, dt f64) {
+pub fn (mut e Emitter) update(dt f64) {
 	e.dt = dt
-	e.system = s
 
 	if e.burst_amount > 0 {
 		e.emit()
@@ -100,7 +98,6 @@ pub fn (mut e Emitter) update(mut s &System, dt f64) {
 fn (mut e Emitter) emit() {
 	mut s := e.system
 	dt := e.dt
-	//mut s := e.system
 	e.elapsed += f32(dt)
 
 	mut reserve := e.rate * e.elapsed
@@ -108,7 +105,6 @@ fn (mut e Emitter) emit() {
 	mut bursting := false
 	if e.burst_amount > 0 {
 		bursting = true
-		//e.burst_position.x += 0.000000000000000001
 		if s.bin.len >= e.burst_amount {
 			reserve = e.burst_amount
 		} else {
@@ -144,12 +140,22 @@ fn (mut e Emitter) emit() {
 		if e.life_time_variation != 0.0 {
 			p.life_time += rand.f32_in_range(-e.life_time_variation,e.life_time_variation)
 		}
-		p.size = e.size_start
-		p.size_end = e.size_end
-		if e.size_variation != 0.0 {
-			sv := rand.f32_in_range(-e.size_variation,e.size_variation)
-			p.size.x = p.size.x + sv
-			p.size.y = p.size.y + sv
+		p.size = e.start_size
+		p.end.size = e.end_size
+		if !e.size_variation.eq_f64(0.0) {
+			mut sv := e.size_variation.copy()
+			sv.abs()
+			if e.emit_size_keep_aspect {
+				sv_aspect := math.max(sv.x,sv.y)
+				p.size.plus_f64(rand.f64_in_range(-sv_aspect, sv_aspect))
+			} else {
+				if sv.x > 0 {
+					p.size.x += rand.f64_in_range(-sv.x, sv.x)
+				}
+				if sv.y > 0 {
+					p.size.y += rand.f64_in_range(-sv.y, sv.y)
+				}
+			}
 		}
 		p.set_init()
 		// Send the particle into the system
