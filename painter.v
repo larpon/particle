@@ -3,7 +3,7 @@
 
 module particle
 
-import rand
+//import rand
 
 import sokol.sgl
 

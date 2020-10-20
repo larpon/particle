@@ -3,7 +3,7 @@
 
 module vec
 
-import math
+//import math
 
 pub struct Vec3 {
 pub mut:
