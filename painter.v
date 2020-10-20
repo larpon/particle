@@ -102,6 +102,7 @@ mut:
 	color_variation	ColorVariation
 
 	path			string
+	mipmap			bool = true
 
 	image			Image
 }
@@ -121,7 +122,12 @@ fn (mut ip ImagePainter) draw(mut p Particle) {
 
 	if !ip.image.ready {
 		eprintln('Loading image "${ip.path}" on demand')
-		ip.image = p.system.load_image(ip.path, true) or { panic(err) }
+		num_mipmap := if ip.mipmap { 4 } else { 0 } // TODO find good trade-off value
+		ip.image = p.system.load_image({
+			path: ip.path
+			mipmaps: num_mipmap
+			cache: true
+		}) or { panic(err) }
 	}
 
 	p.color.a = byte(p.init.color.a * remap(p.life_time, p.init.life_time, p.end.life_time, 1, 0))

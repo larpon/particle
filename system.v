@@ -3,7 +3,11 @@
 
 module particle
 
-type Component = Emitter | RectPainter | ImagePainter // TODO
+const (
+	rad_pi_div_180 = 0.017453292520444443 // ~ pi/180 in radians
+)
+
+type Component = Emitter | RectPainter | ImagePainter | GravityAffector // TODO
 
 // System
 pub struct SystemConfig {
@@ -21,6 +25,9 @@ mut:
 
 	emitters		[]Emitter
 	painters		[]Painter
+	affectors		[]Affector
+
+	dt				f64
 }
 
 pub fn (mut s System) init(sc SystemConfig) {
@@ -66,9 +73,12 @@ pub fn (mut s System) add(c Component) {
 			//c.system = s
 			s.painters << c
 		}
-		/*
+		GravityAffector {
+			eprintln('Adding gravity affector')
+			s.affectors << c
+		}/*
 		else {
-			println('Unknown system component ${c} ')
+			println('Unknown system component (V BUG unprintable)') //${c} BUG doesn't print
 			return
 		}*/
 	}
@@ -92,9 +102,11 @@ pub fn (mut s System) get_emitters(groups []string) []&Emitter {
 }
 
 pub fn (mut s System) update(dt f64) {
-	/*if dt == 0.0 {
-		dt = 0.000001
-	}*/
+	s.dt = dt
+
+	if s.dt == 0.0 {
+		s.dt = 0.000001
+	}
 
 	for i := 0; i < s.emitters.len; i++ {
 		s.emitters[i].update(dt)
@@ -104,7 +116,13 @@ pub fn (mut s System) update(dt f64) {
 	for i := 0; i < s.pool.len; i++ {
 		p = s.pool[i]
 
-		if p.init.eq(p) {
+		if p.is_dead() {
+			s.bin << p
+			s.pool.delete(i)
+			continue
+		}
+
+		if !p.is_ready() {
 			for mut painter in s.painters {
 				match mut painter {
 					RectPainter {
@@ -121,6 +139,22 @@ pub fn (mut s System) update(dt f64) {
 						//eprintln('Painter type ${painter} not supported') // <- struct printing results in some C error
 						eprintln('Painter type init not needed')
 					}
+				}
+			}
+		}
+
+		for mut affector in s.affectors {
+			match mut affector {
+				GravityAffector {
+					if affector.groups.len == 0 || p.group in affector.groups {
+						if affector.collides(p) {
+							affector.affect(mut p)
+						}
+					}
+				}
+				else {
+					//eprintln('Affector type ${painter} not supported') // <- struct printing results in some C error
+					eprintln('Affector type not supported')
 				}
 			}
 		}

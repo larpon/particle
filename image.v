@@ -2,17 +2,24 @@ module particle
 
 import os
 
-//import sokol
+import particle.c
 
 import stbi
 
-/*
-pub struct ImageSize {
+pub const (
+	used_import = c.used_import
+)
+
+pub struct ImageOptions {
 mut:
 	width		int
 	height		int
+
+	cache		bool
+	mipmaps		int
+	path		string
 }
-*/
+
 
 pub struct Image {
 mut:
@@ -27,6 +34,7 @@ mut:
 	channels	int
 	ready		bool
 	mipmaps		int
+
 	data		voidptr
 	ext			string
 
@@ -35,7 +43,9 @@ mut:
 
 //fn C.sg_isvalid() bool
 
-pub fn (mut s System) load_image(path string, cache bool) ?Image {
+pub fn (mut s System) load_image(opt ImageOptions) ?Image {
+	eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' loading "${opt.path}" ...')
+	//eprintln('${opt}')
 	/*if !C.sg_isvalid() {
 		// Sokol is not initialized yet, add stbi object to a queue/cache
 		//s.image_queue << path
@@ -54,27 +64,28 @@ pub fn (mut s System) load_image(path string, cache bool) ?Image {
 		return img
 	}*/
 
-	if !os.is_file(path) {
-		return error(@MOD+'.'+@FN+' File not found: "$path"')
+	if !os.is_file(opt.path) {
+		return error(@MOD+'.'+@FN+' File not found: "${opt.path}"')
 		//return none
 	}
-	uid := os.real_path(path)
+	uid := os.real_path(opt.path)
 	if uid in s.image_cache {
-		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' loading "$path" from cache')
+		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' loading "${opt.path}" from cache')
 		return s.image_cache[uid]
 	}
 
-	stb_img := stbi.load(path) or { return error(err) }
+	stb_img := stbi.load(opt.path) or { return error(err) }
 
 	mut img := Image{
 		width: stb_img.width
 		height: stb_img.height
 		channels: stb_img.nr_channels
-		cache: cache
+		cache: opt.cache
 		ready: stb_img.ok
 		data: stb_img.data
 		ext: stb_img.ext
-		path: path
+		path: opt.path
+		mipmaps: opt.mipmaps
 		/*
 		size: ImageSize {
 			width: stb_img.width
@@ -100,12 +111,22 @@ pub fn (mut img Image) init_sokol_image() &Image {
 		wrap_v: .clamp_to_edge
 		label: &byte(0)
 		d3d11_texture: 0
+		pixel_format: C.SG_PIXELFORMAT_RGBA8
 	}
-	img_desc.content.subimage[0][0] = C.sg_subimage_content{
-		ptr: img.data
-		size: img.channels * img.width * img.height
+
+	if img.mipmaps <= 0 {
+		img_desc.content.subimage[0][0] = C.sg_subimage_content{
+			ptr: img.data
+			size: img.channels * img.width * img.height
+		}
+		img.sg_image = C.sg_make_image(&img_desc)
+	} else {
+		img_desc.content.subimage[0][0] = C.sg_subimage_content{
+			ptr: img.data
+			size: img.channels * img.width * img.height
+		}
+		img.sg_image = C.sg_make_image_with_mipmaps(&img_desc)
 	}
-	img.sg_image = C.sg_make_image(&img_desc)
 	return img
 }
 
