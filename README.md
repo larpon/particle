@@ -2,7 +2,7 @@
 Particle system written in V
 
 Example `main.v`
-```
+```v
 module main
 
 import time
