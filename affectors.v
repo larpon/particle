@@ -25,7 +25,6 @@ type Affector = CustomAffector | GravityAffector | AttractorAffector
 pub struct CustomAffector {
 pub mut:
 	enabled				bool
-
 }
 
 pub struct GravityAffector {
@@ -116,7 +115,7 @@ fn (mut aa AttractorAffector) affect(mut p Particle) {
 		.linear {
 			ds = (aa.strength * math.max(1.,r))
 		}
-		else { // constant
+		.constant { // default
 			ds = aa.strength
 		}
 	}
@@ -133,7 +132,7 @@ fn (mut aa AttractorAffector) affect(mut p Particle) {
 			p.acceleration.x += dx
 			p.acceleration.y += dy
 		}
-		else { // .velocity is also default
+		.velocity { // default
 			p.velocity.x += dx
 			p.velocity.y += dy
 		}

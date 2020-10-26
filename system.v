@@ -108,25 +108,24 @@ pub fn (mut s System) get_emitters(groups []string) []&Emitter {
 
 pub fn (mut s System) update(dt f64) {
 	s.dt = dt
-
-	if s.dt == 0.0 {
+	// Guard against total freeze on low framerates
+	if s.dt <= 0.0 {
 		s.dt = 0.000001
 	}
-
+	// Emitters extract particles from the bin to the pool
 	for i := 0; i < s.emitters.len; i++ {
 		s.emitters[i].update(dt)
 	}
-
+	// Run through the pool of currently active particles
 	mut p := &Particle(0)
 	for i := 0; i < s.pool.len; i++ {
 		p = s.pool[i]
-
 		if p.is_dead() {
 			s.bin << p
 			s.pool.delete(i)
 			continue
 		}
-
+		// Init painters if necessary
 		if !p.is_ready() {
 			for mut painter in s.painters {
 				match mut painter {
@@ -147,7 +146,7 @@ pub fn (mut s System) update(dt f64) {
 				}
 			}
 		}
-
+		// Affect particle
 		for mut affector in s.affectors {
 			match mut affector {
 				GravityAffector {
@@ -175,7 +174,7 @@ pub fn (mut s System) update(dt f64) {
 			s.pool.delete(i)
 			continue
 		}
-		// TODO can be optimized so particle pool is only only traversed once...
+		// TODO could be optimized so particle pool is only only traversed once??
 		// Draw call would be here... remove other draw calls
 	}
 }
@@ -214,14 +213,12 @@ pub fn (mut s System) draw() {
 
 pub fn (mut s System) reset() {
 	eprintln(@MOD+'.'+@STRUCT+'::'+@FN)
-
 	eprintln('Resetting ${s.pool.len} from pool ${s.bin.len}')
 	for p in s.pool {
 		mut pm := p
 		pm.reset()
 		pm.life_time = 0
 	}
-
 	for p in s.bin {
 		mut pm := p
 		pm.reset()
