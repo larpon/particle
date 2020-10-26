@@ -4,10 +4,23 @@
 module particle
 
 import particle.vec
-
 import math
 
-type Affector = CustomAffector | GravityAffector
+enum PhysicsType {
+	constant
+	linear
+	inverse_linear
+	quadratic
+	inverse_quadratic
+}
+
+enum AffectParameter {
+	position
+	velocity
+	acceleration
+}
+
+type Affector = CustomAffector | GravityAffector | AttractorAffector
 
 pub struct CustomAffector {
 pub mut:
@@ -27,7 +40,6 @@ pub mut:
 	angle				f32
 	magnitude			f32
 
-	//
 	/*location			StochasticDirection
 	velocity			StochasticDirection
 	acceleration		StochasticDirection*/
@@ -60,7 +72,70 @@ fn (mut ga GravityAffector) affect(mut p Particle) {
 	//}
 	p.velocity.x += dx*p.system.dt
 	p.velocity.y += dy*p.system.dt
+}
 
-	//d->setInstantaneousVX(d->curVX(m_system) + m_dx*dt, m_system);
-	//d->setInstantaneousVY(d->curVY(m_system) + m_dy*dt, m_system);
+
+
+pub struct AttractorAffector {
+pub mut:
+	enabled				bool
+
+	position			vec.Vec2	// Center position of the affector
+	strength			f32
+
+	groups				[]string	// Leave empty to affect all particles
+
+	affected_parameter			AffectParameter // What attribute of the particles is affected
+	proportional_to_distance	PhysicsType // How the distance from the particle to the point affects the strength of the attraction
+
+}
+
+fn (mut aa AttractorAffector) affect(mut p Particle) {
+	//println('Affecting particle by attaction')
+
+	if aa.strength == 0.0 {
+		return
+	}
+	mut dx := aa.position.x - p.position.x
+	mut dy := aa.position.y - p.position.y
+
+	r := math.sqrt((dx*dx) + (dy*dy))
+	theta := math.atan2(dy,dx)
+	mut ds := 0.0
+
+	match aa.proportional_to_distance {
+		.inverse_quadratic {
+			ds = (aa.strength / math.max(1.,r*r))
+		}
+		.inverse_linear {
+			ds = (aa.strength / math.max(1.,r))
+		}
+		.quadratic {
+			ds = (aa.strength * math.max(1.,r*r))
+		}
+		.linear {
+			ds = (aa.strength * math.max(1.,r))
+		}
+		else { // constant
+			ds = aa.strength
+		}
+	}
+	ds *= p.system.dt
+	dx = ds * math.cos(theta)
+	dy = ds * math.sin(theta)
+
+	match aa.affected_parameter {
+		.position {
+			p.position.x += dx
+			p.position.y += dy
+		}
+		.acceleration {
+			p.acceleration.x += dx
+			p.acceleration.y += dy
+		}
+		else { // .velocity is also default
+			p.velocity.x += dx
+			p.velocity.y += dy
+		}
+	}
 }

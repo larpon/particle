@@ -7,7 +7,7 @@ const (
 	rad_pi_div_180 = 0.017453292520444443 // ~ pi/180 in radians
 )
 
-type Component = Emitter | RectPainter | ImagePainter | GravityAffector // TODO
+type Component = Emitter | RectPainter | ImagePainter | GravityAffector | AttractorAffector // TODO
 
 // System
 pub struct SystemConfig {
@@ -76,7 +76,12 @@ pub fn (mut s System) add(c Component) {
 		GravityAffector {
 			eprintln('Adding gravity affector')
 			s.affectors << c
-		}/*
+		}
+		AttractorAffector {
+			eprintln('Adding attractor affector')
+			s.affectors << c
+		}
+		/*
 		else {
 			println('Unknown system component (V BUG unprintable)') //${c} BUG doesn't print
 			return
@@ -150,6 +155,11 @@ pub fn (mut s System) update(dt f64) {
 						if affector.collides(p) {
 							affector.affect(mut p)
 						}
+					}
+				}
+				AttractorAffector {
+					if affector.groups.len == 0 || p.group in affector.groups {
+						affector.affect(mut p)
 					}
 				}
 				else {
