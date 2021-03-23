@@ -74,7 +74,7 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 		return s.image_cache[uid]
 	}
 
-	stb_img := stbi.load(opt.path) or { return error(err) }
+	stb_img := stbi.load(opt.path) or { return err }
 
 	mut img := Image{
 		width: stb_img.width
@@ -111,7 +111,7 @@ pub fn (mut img Image) init_sokol_image() &Image {
 		wrap_v: .clamp_to_edge
 		label: &byte(0)
 		d3d11_texture: 0
-		pixel_format: C.SG_PIXELFORMAT_RGBA8
+		pixel_format: .rgba8 // C.SG_PIXELFORMAT_RGBA8
 	}
 
 	img_desc.content.subimage[0][0] = C.sg_subimage_content{

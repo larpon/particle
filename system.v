@@ -7,7 +7,7 @@ const (
 	rad_pi_div_180 = 0.017453292520444443 // ~ pi/180 in radians
 )
 
-type Component = Emitter | RectPainter | ImagePainter | GravityAffector | AttractorAffector // TODO
+type Component = Emitter | Painter | Affector
 
 // System
 pub struct SystemConfig {
@@ -46,10 +46,10 @@ pub fn (mut s System) init(sc SystemConfig) {
 		$if debug {
 			eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' adding default painter.')
 		}
-		s.add(RectPainter{
+		s.add(Painter(RectPainter{
 			groups: [""]
 			color: particle.default_color
-		})
+		}))
 	}
 }
 
@@ -62,24 +62,40 @@ pub fn (mut s System) add(c Component) {
 			c.system = s
 			s.emitters << c
 		}
-		RectPainter {
-			eprintln('Adding rectangle painter')
-			//e := c as Emitter
-			s.painters << c
+		Painter {
+			mut p := c
+			match mut p {
+				RectPainter {
+					eprintln('Adding rectangle painter')
+					//e := c as Emitter
+					s.painters << p
+				}
+				ImagePainter {
+					eprintln('Adding image painter')
+					//e := c as Emitter
+					//c.system = s
+					s.painters << p
+				}
+				else {
+					eprintln('Unknown Painter type')
+				}
+			}
 		}
-		ImagePainter {
-			eprintln('Adding image painter')
-			//e := c as Emitter
-			//c.system = s
-			s.painters << c
-		}
-		GravityAffector {
-			eprintln('Adding gravity affector')
-			s.affectors << c
-		}
-		AttractorAffector {
-			eprintln('Adding attractor affector')
-			s.affectors << c
+		Affector {
+			mut a := c
+			match mut a {
+				GravityAffector {
+					eprintln('Adding gravity affector')
+					s.affectors << a
+				}
+				AttractorAffector {
+					eprintln('Adding attractor affector')
+					s.affectors << a
+				}
+				else {
+					eprintln('Unknown Affector type')
+				}
+			}
 		}
 		/*
 		else {
@@ -180,7 +196,6 @@ pub fn (mut s System) update(dt f64) {
 }
 
 pub fn (mut s System) draw() {
-
 	mut p := &Particle(0)
 	//for mut p in s.pool {
 	for i := 0; i < s.pool.len; i++ {
@@ -188,7 +203,6 @@ pub fn (mut s System) draw() {
 		if p.is_dead() || !p.is_ready() {
 			continue
 		}
-
 		for mut painter in s.painters {
 			match mut painter {
 				RectPainter {
@@ -208,7 +222,6 @@ pub fn (mut s System) draw() {
 			}
 		}
 	}
-
 }
 
 pub fn (mut s System) reset() {
@@ -233,15 +246,12 @@ pub fn (mut s System) free() {
 		mut im := image
 		im.free()
 	}
-
 	eprintln('Freeing ${s.pool.len} from pool')
 	for p in s.pool {
-
 		if p == 0 {
 			print(ptr_str(p)+' ouch')
 			continue
 		}
-
 		unsafe{
 			p.free()
 		}
