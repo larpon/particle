@@ -114,10 +114,11 @@ pub fn (mut img Image) init_sokol_image() &Image {
 		pixel_format: .rgba8 // C.SG_PIXELFORMAT_RGBA8
 	}
 
-	img_desc.content.subimage[0][0] = C.sg_subimage_content{
+	img_desc.data.subimage[0][0]  = C.sg_range{
 		ptr: img.data
-		size: img.channels * img.width * img.height
+		size: size_t(img.channels * img.width * img.height)
 	}
+
 	if img.mipmaps <= 0 {
 		img.sg_image = C.sg_make_image(&img_desc)
 	} else {

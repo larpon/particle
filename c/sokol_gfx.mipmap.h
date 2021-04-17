@@ -1,7 +1,7 @@
 // From github user Deins (https://github.com/Deins)
 // https://github.com/Deins/sokol/blob/abb7c8fd5d1a513409be8e339b2cefd26dae66bb/sokol_gfx.h#L11659-L11720
 
-SOKOL_API_DECL sg_image sg_make_image_with_mipmaps(const sg_image_desc* desc);
+/*SOKOL_API_DECL*/ sg_image sg_make_image_with_mipmaps(const sg_image_desc* desc);
 
 SOKOL_API_IMPL sg_image sg_make_image_with_mipmaps(const sg_image_desc* desc_)
 {
@@ -19,7 +19,7 @@ SOKOL_API_IMPL sg_image sg_make_image_with_mipmaps(const sg_image_desc* desc_)
         int target_height = desc.height;
         for (int level = 1; level < SG_MAX_MIPMAPS; ++level)
         {
-            unsigned char* source = (unsigned char*)desc.content.subimage[cube_face][level - 1].ptr;
+            unsigned char* source = (unsigned char*)desc.data.subimage[cube_face][level - 1].ptr;
             unsigned img_size = target_width * target_height * pixel_size;
             unsigned char* target = (unsigned char*)SOKOL_MALLOC(img_size);
             buffers[cube_face][level] = target;
@@ -51,8 +51,8 @@ SOKOL_API_IMPL sg_image sg_make_image_with_mipmaps(const sg_image_desc* desc_)
                     }
                 }
             }
-            desc.content.subimage[cube_face][level].ptr = target;
-            desc.content.subimage[cube_face][level].size = img_size;
+            desc.data.subimage[cube_face][level].ptr = target;
+            desc.data.subimage[cube_face][level].size = img_size;
             if (desc.num_mipmaps <= level) desc.num_mipmaps = level + 1;
         }
     }
