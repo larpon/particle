@@ -104,16 +104,16 @@ fn (mut aa AttractorAffector) affect(mut p Particle) {
 
 	match aa.proportional_to_distance {
 		.inverse_quadratic {
-			ds = (aa.strength / math.max(1.,r*r))
+			ds = (aa.strength / math.max(1.0,r*r))
 		}
 		.inverse_linear {
-			ds = (aa.strength / math.max(1.,r))
+			ds = (aa.strength / math.max(1.0,r))
 		}
 		.quadratic {
-			ds = (aa.strength * math.max(1.,r*r))
+			ds = (aa.strength * math.max(1.0,r*r))
 		}
 		.linear {
-			ds = (aa.strength * math.max(1.,r))
+			ds = (aa.strength * math.max(1.0,r))
 		}
 		.constant { // default
 			ds = aa.strength

@@ -69,6 +69,7 @@ pub fn (mut s System) new_particle() &Particle {
 /*
 * Particle
 */
+[heap]
 pub struct Particle {
 mut:
 	system			&System

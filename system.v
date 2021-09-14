@@ -14,6 +14,7 @@ pub struct SystemConfig {
 	pool	int
 }
 
+[heap]
 pub struct System {
 	width			int
 	height			int
