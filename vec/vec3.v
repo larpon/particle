@@ -3,7 +3,7 @@
 
 module vec
 
-//import math
+// import math
 
 pub struct Vec3 {
 pub mut:
@@ -19,7 +19,7 @@ pub fn (mut v Vec3) zero() {
 }
 
 pub fn (mut v Vec3) copy() Vec3 {
-	return Vec3{ v.x, v.y, v.z }
+	return Vec3{v.x, v.y, v.z}
 }
 
 pub fn (mut v Vec3) from(u Vec3) {
@@ -34,8 +34,9 @@ pub fn (mut v Vec3) from_vec2(u Vec2) {
 }
 
 pub fn (mut v Vec3) as_vec2() Vec2 {
-	return Vec2{ v.x, v.y }
+	return Vec2{v.x, v.y}
 }
+
 //
 // Addition
 //
@@ -45,19 +46,19 @@ pub fn (v1 Vec3) + (v2 Vec3) Vec3 {
 }
 
 pub fn (v Vec3) add(u Vec3) Vec3 {
-	return Vec3{ v.x + u.x, v.y + u.y, v.z + u.z }
+	return Vec3{v.x + u.x, v.y + u.y, v.z + u.z}
 }
 
 pub fn (v Vec3) add_vec2(u Vec2) Vec3 {
-	return Vec3{ v.x + u.x, v.y + u.y, v.z }
+	return Vec3{v.x + u.x, v.y + u.y, v.z}
 }
 
 pub fn (v Vec3) add_f64(scalar f64) Vec3 {
-	return Vec3{ v.x + scalar, v.y + scalar, v.z + scalar }
+	return Vec3{v.x + scalar, v.y + scalar, v.z + scalar}
 }
 
 pub fn (v Vec3) add_f32(scalar f32) Vec3 {
-	return Vec3{ v.x + scalar, v.y + scalar, v.z + scalar }
+	return Vec3{v.x + scalar, v.y + scalar, v.z + scalar}
 }
 
 pub fn (mut v Vec3) plus(u Vec3) {
@@ -86,11 +87,11 @@ pub fn (v1 Vec3) - (v2 Vec3) Vec3 {
 }
 
 pub fn (v Vec3) sub(u Vec3) Vec3 {
-	return Vec3{ v.x - u.x, v.y - u.y, v.z - u.z }
+	return Vec3{v.x - u.x, v.y - u.y, v.z - u.z}
 }
 
 pub fn (v Vec3) sub_f64(scalar f64) Vec3 {
-	return Vec3{ v.x - scalar, v.y - scalar, v.z - scalar }
+	return Vec3{v.x - scalar, v.y - scalar, v.z - scalar}
 }
 
 pub fn (mut v Vec3) subtract(u Vec3) {
@@ -104,6 +105,7 @@ pub fn (mut v Vec3) subtract_f64(scalar f64) {
 	v.y -= scalar
 	v.z -= scalar
 }
+
 //
 // Multiplication
 //
@@ -112,11 +114,11 @@ pub fn (v1 Vec3) * (v2 Vec3) Vec3 {
 }
 
 pub fn (v Vec3) mul(u Vec3) Vec3 {
-	return Vec3{ v.x * u.x, v.y * u.y, v.z * u.z }
+	return Vec3{v.x * u.x, v.y * u.y, v.z * u.z}
 }
 
 pub fn (v Vec3) mul_f64(scalar f64) Vec3 {
-	return Vec3{ v.x * scalar, v.y * scalar, v.z * scalar }
+	return Vec3{v.x * scalar, v.y * scalar, v.z * scalar}
 }
 
 pub fn (mut v Vec3) multiply(u Vec3) {
@@ -135,15 +137,15 @@ pub fn (mut v Vec3) multiply_f64(scalar f64) {
 // Division
 //
 pub fn (v1 Vec3) / (v2 Vec3) Vec3 {
-	return Vec3{v1.x / v2.x, v1.y / v2.y, v1.z / v2.z }
+	return Vec3{v1.x / v2.x, v1.y / v2.y, v1.z / v2.z}
 }
 
 pub fn (v Vec3) div(u Vec3) Vec3 {
-	return Vec3{ v.x / u.x, v.y / u.y, v.z / u.z }
+	return Vec3{v.x / u.x, v.y / u.y, v.z / u.z}
 }
 
 pub fn (v Vec3) div_f64(scalar f64) Vec3 {
-	return Vec3{ v.x / scalar, v.y / scalar, v.z / scalar }
+	return Vec3{v.x / scalar, v.y / scalar, v.z / scalar}
 }
 
 pub fn (mut v Vec3) divide(u Vec3) {
@@ -157,7 +159,9 @@ pub fn (mut v Vec3) divide_f64(scalar f64) {
 	v.y /= scalar
 	v.z /= scalar
 }
-/* TODO
+
+/*
+TODO
 //
 // Utility
 //
@@ -200,6 +204,7 @@ pub fn (v Vec3) project(u Vec3) Vec3 {
 pub fn (v Vec3) eq(u Vec3) bool {
 	return v.x == u.x && v.y == u.y && v.z == u.z
 }
+
 /*
 // eq_epsilon returns a bool indicating if the two vectors are equal within epsilon
 pub fn (v Vec3) eq_epsilon(u Vec3) bool {

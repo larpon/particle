@@ -22,29 +22,30 @@ fn (c Color) eq(rgba Color) bool {
 	return c.r == rgba.r && c.g == rgba.g && c.b == rgba.b && c.a == rgba.a
 }
 
-
 fn (mut c Color) variation(cv ColorVariation) {
-	if !cv.has_variation() { return }
+	if !cv.has_variation() {
+		return
+	}
 	if cv.r > 0 {
-		c.r = byte(c.r * (1 - cv.r) + rand.f32_in_range(0,255) * cv.r)
+		c.r = byte(c.r * (1 - cv.r) + rand.f32_in_range(0, 255) * cv.r)
 	}
 	if cv.g > 0 {
-		c.g = byte(c.g * (1 - cv.g) + rand.f32_in_range(0,255) * cv.g)
+		c.g = byte(c.g * (1 - cv.g) + rand.f32_in_range(0, 255) * cv.g)
 	}
 	if cv.b > 0 {
-		c.b = byte(c.b * (1 - cv.b) + rand.f32_in_range(0,255) * cv.b)
+		c.b = byte(c.b * (1 - cv.b) + rand.f32_in_range(0, 255) * cv.b)
 	}
 	if cv.a > 0 {
-		c.a = byte(c.a * (1 - cv.a) + rand.f32_in_range(0,255) * cv.a)
+		c.a = byte(c.a * (1 - cv.a) + rand.f32_in_range(0, 255) * cv.a)
 	}
 }
 
 pub struct ColorVariation {
 pub mut:
-	r	f32
-	g	f32
-	b	f32
-	a	f32
+	r f32
+	g f32
+	b f32
+	a f32
 }
 
 fn (mut cv ColorVariation) all(value f32) {
@@ -54,7 +55,7 @@ fn (mut cv ColorVariation) all(value f32) {
 	cv.a = value
 }
 
-fn (mut cv ColorVariation) set(r f32,g f32,b f32,a f32) {
+fn (mut cv ColorVariation) set(r f32, g f32, b f32, a f32) {
 	cv.r = r
 	cv.g = g
 	cv.b = b
@@ -62,10 +63,10 @@ fn (mut cv ColorVariation) set(r f32,g f32,b f32,a f32) {
 }
 
 fn (mut cv ColorVariation) max(max f32) {
-	cv.r = f32(math.min(max,cv.r))
-	cv.g = f32(math.min(max,cv.g))
-	cv.b = f32(math.min(max,cv.b))
-	cv.a = f32(math.min(max,cv.a))
+	cv.r = f32(math.min(max, cv.r))
+	cv.g = f32(math.min(max, cv.g))
+	cv.b = f32(math.min(max, cv.b))
+	cv.a = f32(math.min(max, cv.a))
 }
 
 fn (cv ColorVariation) has_variation() bool {

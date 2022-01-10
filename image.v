@@ -1,9 +1,7 @@
 module particle
 
 import os
-
 import particle.c
-
 import sokol.gfx
 import stbi
 
@@ -13,39 +11,40 @@ pub const (
 
 pub struct ImageOptions {
 mut:
-	width		int
-	height		int
+	width  int
+	height int
 
-	cache		bool
-	mipmaps		int
-	path		string
+	cache   bool
+	mipmaps int
+	path    string
 }
 
 [heap]
 pub struct Image {
 mut:
-	width		int
-	height		int
+	width  int
+	height int
 
-	cache		bool
+	cache bool
 
-	path		string
-	//size		ImageSize
+	path string
+	// size		ImageSize
 
-	channels	int
-	ready		bool
-	mipmaps		int
+	channels int
+	ready    bool
+	mipmaps  int
 
-	data		voidptr
-	ext			string
+	data voidptr
+	ext  string
 
-	sg_image	gfx.Image
+	sg_image gfx.Image
 }
 
 pub fn (mut s System) load_image(opt ImageOptions) ?Image {
-	eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' loading "${opt.path}" ...')
-	//eprintln('${opt}')
-	/*if !C.sg_isvalid() {
+	eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading "$opt.path" ...')
+	// eprintln('${opt}')
+	/*
+	if !C.sg_isvalid() {
 		// Sokol is not initialized yet, add stbi object to a queue/cache
 		//s.image_queue << path
 		stb_img := stbi.load(path) or { return Image{} }
@@ -66,32 +65,32 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 	mut image_path := opt.path
 	mut buffer := []byte{}
 	$if android {
-		image_path = image_path.replace('assets/','') // TODO
+		image_path = image_path.replace('assets/', '') // TODO
 		buffer = os.read_apk_asset(image_path) or {
-			return error(@MOD+'.'+@FN+' (Android) file "$image_path" not found')
+			return error(@MOD + '.' + @FN + ' (Android) file "$image_path" not found')
 		}
 	} $else {
 		if !os.is_file(image_path) {
-			return error(@MOD+'.'+@FN+' file "$image_path" not found')
-			//return none
+			return error(@MOD + '.' + @FN + ' file "$image_path" not found')
+			// return none
 		}
 		image_path = os.real_path(image_path)
 		buffer = os.read_bytes(image_path) or {
-			return error(@MOD+'.'+@FN+' file "$image_path" could not be read')
+			return error(@MOD + '.' + @FN + ' file "$image_path" could not be read')
 		}
 	}
 
-	uid := image_path //os.real_path(image_path)
+	uid := image_path // os.real_path(image_path)
 	if uid in s.image_cache {
-		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' loading "$image_path" from cache')
+		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading "$image_path" from cache')
 		return s.image_cache[uid]
 	}
 
-	//stb_img := stbi.load(opt.path) or { return err }
+	// stb_img := stbi.load(opt.path) or { return err }
 
-	eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' loading $buffer.len bytes from memory ...')
+	eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading $buffer.len bytes from memory ...')
 	stb_img := stbi.load_from_memory(buffer.data, buffer.len) or {
-		return error(@MOD+'.'+@FN+' stbi failed loading "$image_path"')
+		return error(@MOD + '.' + @FN + ' stbi failed loading "$image_path"')
 	}
 
 	mut img := Image{
@@ -111,10 +110,10 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 		}*/
 	}
 	img.init_sokol_image()
-	//stb_img.free() // TODO ??
+	// stb_img.free() // TODO ??
 
-	if img.cache && !(uid in s.image_cache.keys()) {
-		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' caching "$uid"')
+	if img.cache && uid !in s.image_cache.keys() {
+		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' caching "$uid"')
 		s.image_cache[uid] = img
 	}
 
@@ -122,11 +121,11 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 }
 
 pub fn (mut img Image) init_sokol_image() &Image {
-	eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' init sokol image $img')
+	// eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' init sokol image $img')
 	mut img_desc := gfx.ImageDesc{
 		width: img.width
 		height: img.height
-		//num_mipmaps: img.mipmaps
+		// num_mipmaps: img.mipmaps
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
 		label: &byte(0)
@@ -134,13 +133,13 @@ pub fn (mut img Image) init_sokol_image() &Image {
 		pixel_format: .rgba8 // C.SG_PIXELFORMAT_RGBA8
 	}
 
-	img_desc.data.subimage[0][0]  = gfx.Range{
+	img_desc.data.subimage[0][0] = gfx.Range{
 		ptr: img.data
 		size: usize(img.channels * img.width * img.height)
 	}
 
-	//if img.mipmaps <= 0 {
-		img.sg_image = gfx.make_image(&img_desc)
+	// if img.mipmaps <= 0 {
+	img.sg_image = gfx.make_image(&img_desc)
 	//}
 	// else {
 	//	img.sg_image = C.sg_make_image_with_mipmaps(&img_desc)

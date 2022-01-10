@@ -17,13 +17,14 @@ pub fn (mut v Vec2) zero() {
 }
 
 pub fn (mut v Vec2) copy() Vec2 {
-	return Vec2{ v.x, v.y }
+	return Vec2{v.x, v.y}
 }
 
 pub fn (mut v Vec2) from(u Vec2) {
 	v.x = u.x
 	v.y = u.y
 }
+
 //
 // Addition
 //
@@ -33,15 +34,15 @@ pub fn (v1 Vec2) + (v2 Vec2) Vec2 {
 }
 
 pub fn (v Vec2) add(u Vec2) Vec2 {
-	return Vec2{ v.x + u.x, v.y + u.y }
+	return Vec2{v.x + u.x, v.y + u.y}
 }
 
 pub fn (v Vec2) add_f64(scalar f64) Vec2 {
-	return Vec2{ v.x + scalar, v.y + scalar }
+	return Vec2{v.x + scalar, v.y + scalar}
 }
 
 pub fn (v Vec2) add_f32(scalar f32) Vec2 {
-	return Vec2{ v.x + scalar, v.y + scalar }
+	return Vec2{v.x + scalar, v.y + scalar}
 }
 
 pub fn (mut v Vec2) plus(u Vec2) {
@@ -67,11 +68,11 @@ pub fn (v1 Vec2) - (v2 Vec2) Vec2 {
 }
 
 pub fn (v Vec2) sub(u Vec2) Vec2 {
-	return Vec2{ v.x - u.x, v.y - u.y }
+	return Vec2{v.x - u.x, v.y - u.y}
 }
 
 pub fn (v Vec2) sub_f64(scalar f64) Vec2 {
-	return Vec2{ v.x - scalar, v.y - scalar }
+	return Vec2{v.x - scalar, v.y - scalar}
 }
 
 pub fn (mut v Vec2) subtract(u Vec2) {
@@ -92,11 +93,11 @@ pub fn (v1 Vec2) * (v2 Vec2) Vec2 {
 }
 
 pub fn (v Vec2) mul(u Vec2) Vec2 {
-	return Vec2{ v.x * u.x, v.y * u.y }
+	return Vec2{v.x * u.x, v.y * u.y}
 }
 
 pub fn (v Vec2) mul_f64(scalar f64) Vec2 {
-	return Vec2{ v.x * scalar, v.y * scalar }
+	return Vec2{v.x * scalar, v.y * scalar}
 }
 
 pub fn (mut v Vec2) multiply(u Vec2) {
@@ -117,11 +118,11 @@ pub fn (v1 Vec2) / (v2 Vec2) Vec2 {
 }
 
 pub fn (v Vec2) div(u Vec2) Vec2 {
-	return Vec2{ v.x / u.x, v.y / u.y }
+	return Vec2{v.x / u.x, v.y / u.y}
 }
 
 pub fn (v Vec2) div_f64(scalar f64) Vec2 {
-	return Vec2{ v.x / scalar, v.y / scalar }
+	return Vec2{v.x / scalar, v.y / scalar}
 }
 
 pub fn (mut v Vec2) divide(u Vec2) {
@@ -138,27 +139,29 @@ pub fn (mut v Vec2) divide_f64(scalar f64) {
 // Utility
 //
 pub fn (v Vec2) length() f64 {
-	if v.x == 0 && v.y == 0 { return 0.0 }
-	return math.sqrt((v.x*v.x) + (v.y*v.y))
+	if v.x == 0 && v.y == 0 {
+		return 0.0
+	}
+	return math.sqrt((v.x * v.x) + (v.y * v.y))
 }
 
 pub fn (v Vec2) dot(u Vec2) f64 {
-	return (v.x * u.x) + (v.y*u.y)
+	return (v.x * u.x) + (v.y * u.y)
 }
 
 // cross returns the cross product of v and u
 pub fn (v Vec2) cross(u Vec2) f64 {
-	return (v.x * u.y) - (v.y*u.x)
+	return (v.x * u.y) - (v.y * u.x)
 }
 
 // unit return this vector's unit vector
 pub fn (v Vec2) unit() Vec2 {
 	length := v.length()
-	return Vec2{ v.x/length, v.y/length }
+	return Vec2{v.x / length, v.y / length}
 }
 
 pub fn (v Vec2) perp() Vec2 {
-	return Vec2{ -v.y, v.x }
+	return Vec2{-v.y, v.x}
 }
 
 // perpendicular return the perpendicular vector of this
@@ -219,17 +222,17 @@ pub fn (v Vec2) eq_f32(scalar f32) bool {
 
 // distance returns the distance between the two vectors
 pub fn (v Vec2) distance(u Vec2) f64 {
-	return math.sqrt( (v.x-u.x) * (v.x-u.x) + (v.y-u.y) * (v.y-u.y) )
+	return math.sqrt((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
 }
 
 // manhattan_distance returns the Manhattan distance between the two vectors
 pub fn (v Vec2) manhattan_distance(u Vec2) f64 {
-	return math.abs(v.x-u.x) + math.abs(v.y-u.y)
+	return math.abs(v.x - u.x) + math.abs(v.y - u.y)
 }
 
 // angle_between returns the angle in radians between the two vectors
 pub fn (v Vec2) angle_between(u Vec2) f64 {
-	return math.atan2( (v.y-u.y), (v.x-u.x) )
+	return math.atan2((v.y - u.y), (v.x - u.x))
 }
 
 // angle returns the angle in radians of the vector
@@ -246,4 +249,3 @@ pub fn (mut v Vec2) abs() {
 		v.y = math.abs(v.y)
 	}
 }
-

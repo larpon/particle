@@ -5,50 +5,48 @@ module particle
 
 import math
 import rand
-
 import particle.vec
 
 pub struct Emitter {
 pub mut:
-	enabled				bool
+	enabled bool
 
-	position			vec.Vec2	// Center position of the emitter
-	size				vec.Vec2	// Max size of the emitter
+	position vec.Vec2 // Center position of the emitter
+	size     vec.Vec2 // Max size of the emitter
 
-	velocity			StochasticDirection
-	acceleration		StochasticDirection
+	velocity     StochasticDirection
+	acceleration StochasticDirection
 
-	start_size			vec.Vec2 = default_size	// Emitted particles start their life in this size
-	end_size			vec.Vec2	// Emitted particles end their life in this size
-	size_variation		vec.Vec2	// Particle size will vary up/down to a maximum of this value
-	emit_size_keep_aspect	bool = true
+	start_size            vec.Vec2 = default_size // Emitted particles start their life in this size
+	end_size              vec.Vec2 // Emitted particles end their life in this size
+	size_variation        vec.Vec2 // Particle size will vary up/down to a maximum of this value
+	emit_size_keep_aspect bool = true
 
-	life_time			f32 = 1000	// How long the particles emitted will last
-	life_time_variation	f32			// Particle life time will vary up/down to a maximum of this value
+	life_time           f32 = 1000 // How long the particles emitted will last
+	life_time_variation f32 // Particle life time will vary up/down to a maximum of this value
 
-	rate				f32 = 10.0	// Particles emitted per second
+	rate f32 = 10.0 // Particles emitted per second
 
-	group				string		// Logical group the emitted particles belong to
+	group string // Logical group the emitted particles belong to
 
-	shape				Shape		// TODO
-
+	shape Shape  // TODO
 	/*
 	Provide an additional starting velocity to the emitted particles based on the emitter's movement.
 	The added velocity vector will have the same angle as the emitter's movement,
 	with a magnitude that is the magnitude of the emitters movement multiplied by the  movement_velocity.
 	*/
-	movement_velocity		f32
-	movement_velocity_flip	bool
+	movement_velocity      f32
+	movement_velocity_flip bool
 mut:
-	position_last_frame	vec.Vec2
+	position_last_frame vec.Vec2
 
-	system				&System = 0
-	dt					f64			// current delta time this frame
-	elapsed				f32			// Elapsed time accumulator
+	system  &System = 0
+	dt      f64   // current delta time this frame
+	elapsed f32 // Elapsed time accumulator
 
-	burst_position		vec.Vec2	// Center position of the burst
-	burst_amount		int
-	pulse_duration		int
+	burst_position vec.Vec2 // Center position of the burst
+	burst_amount   int
+	pulse_duration int
 }
 
 /*
@@ -114,11 +112,11 @@ fn (mut e Emitter) emit() {
 	}
 
 	if reserve < 1 {
-		//eprintln('Accumulating time. Reserve ${reserve} elapsed ${e.elapsed} dt ${dt} rate ${e.rate}')
+		// eprintln('Accumulating time. Reserve ${reserve} elapsed ${e.elapsed} dt ${dt} rate ${e.rate}')
 		return
 	}
 	e.elapsed = 0
-	//eprintln('Reserving ${reserve} particles from pool of ${s.bin.len}')
+	// eprintln('Reserving ${reserve} particles from pool of ${s.bin.len}')
 	mut p := &Particle(0)
 	for i := 0; i < s.bin.len && reserve > 0; i++ {
 		p = s.bin[i]
@@ -138,7 +136,7 @@ fn (mut e Emitter) emit() {
 
 		p.life_time = e.life_time
 		if e.life_time_variation != 0.0 {
-			p.life_time += rand.f32_in_range(-e.life_time_variation,e.life_time_variation)
+			p.life_time += rand.f32_in_range(-e.life_time_variation, e.life_time_variation)
 		}
 		p.size = e.start_size
 		p.end.size = e.end_size
@@ -146,7 +144,7 @@ fn (mut e Emitter) emit() {
 			mut sv := e.size_variation.copy()
 			sv.abs()
 			if e.emit_size_keep_aspect {
-				sv_aspect := math.max(sv.x,sv.y)
+				sv_aspect := math.max(sv.x, sv.y)
 				p.size.plus_f64(rand.f64_in_range(-sv_aspect, sv_aspect))
 			} else {
 				if sv.x > 0 {
@@ -177,7 +175,7 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2, sd StochasticDirec
 			v.from(sd.point)
 
 			if !sd.point_variation.eq_f64(0.0) {
-				mut pv := sd.point_variation + vec.Vec2{0,0} //.copy()
+				mut pv := sd.point_variation + vec.Vec2{0, 0} //.copy()
 				pv.abs()
 				if pv.x > 0 {
 					v.x += rand.f64_in_range(-pv.x, pv.x)
@@ -193,14 +191,13 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2, sd StochasticDirec
 				} else {
 					e.position - e.position_last_frame
 				}
-				fvm := (e.movement_velocity/1000)
+				fvm := (e.movement_velocity / 1000)
 				angle_rad := d.angle()
 				magnitude := f32(e.position.manhattan_distance(d))
 
 				v.x += fvm * (magnitude * math.cos(angle_rad)) * e.dt
 				v.y += fvm * (magnitude * math.sin(angle_rad)) * e.dt
 			}
-
 		}
 		AngleDirection {
 			mut angle := sd.angle
@@ -219,7 +216,7 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2, sd StochasticDirec
 		TargetDirection {
 			mut target := e.position - sd.target
 			if !sd.target_variation.eq_f64(0.0) {
-				mut tv := sd.target_variation + vec.Vec2{0,0} // .copy()
+				mut tv := sd.target_variation + vec.Vec2{0, 0} // .copy()
 				tv.abs()
 				if tv.x > 0 {
 					target.x += rand.f64_in_range(-tv.x, tv.x)

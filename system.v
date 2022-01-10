@@ -7,59 +7,59 @@ const (
 	rad_pi_div_180 = 0.017453292520444443 // ~ pi/180 in radians
 )
 
-type Component = Emitter | Painter | Affector
+type Component = Affector | Emitter | Painter
 
 // System
 pub struct SystemConfig {
-	pool	int
+	pool int
 }
 
 [heap]
 pub struct System {
-	width			int
-	height			int
+	width  int
+	height int
 mut:
-	pool			[]&Particle
-	bin				[]&Particle
+	pool []&Particle
+	bin  []&Particle
 
-	image_cache		map[string]Image
+	image_cache map[string]Image
 
-	emitters		[]Emitter
-	painters		[]Painter
-	affectors		[]Affector
+	emitters  []Emitter
+	painters  []Painter
+	affectors []Affector
 
-	dt				f64
+	dt f64
 }
 
 pub fn (mut s System) init(sc SystemConfig) {
 	$if debug {
-		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' creating $sc.pool particles.')
+		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' creating $sc.pool particles.')
 	}
 	for i := 0; i < sc.pool; i++ {
 		p := s.new_particle()
 		s.bin << p
 	}
 	$if debug {
-		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' created $sc.pool particles.')
+		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' created $sc.pool particles.')
 	}
 
 	if s.painters.len == 0 {
 		$if debug {
-			eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' adding default painter.')
+			eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' adding default painter.')
 		}
 		s.add(Painter(RectPainter{
-			groups: [""]
+			groups: ['']
 			color: particle.default_color
 		}))
 	}
 }
 
 pub fn (mut s System) add(c Component) {
-	//eprintln('Adding something')
+	// eprintln('Adding something')
 	match mut c {
 		Emitter {
 			eprintln('Adding emitter')
-			//e := c as Emitter
+			// e := c as Emitter
 			c.system = s
 			s.emitters << c
 		}
@@ -68,13 +68,13 @@ pub fn (mut s System) add(c Component) {
 			match mut p {
 				RectPainter {
 					eprintln('Adding rectangle painter')
-					//e := c as Emitter
+					// e := c as Emitter
 					s.painters << p
 				}
 				ImagePainter {
 					eprintln('Adding image painter')
-					//e := c as Emitter
-					//c.system = s
+					// e := c as Emitter
+					// c.system = s
 					s.painters << p
 				}
 				else {
@@ -157,7 +157,7 @@ pub fn (mut s System) update(dt f64) {
 						}
 					}
 					else {
-						//eprintln('Painter type ${painter} not supported') // <- struct printing results in some C error
+						// eprintln('Painter type ${painter} not supported') // <- struct printing results in some C error
 						eprintln('Painter type init not needed')
 					}
 				}
@@ -179,7 +179,7 @@ pub fn (mut s System) update(dt f64) {
 					}
 				}
 				else {
-					//eprintln('Affector type ${painter} not supported') // <- struct printing results in some C error
+					// eprintln('Affector type ${painter} not supported') // <- struct printing results in some C error
 					eprintln('Affector type not supported')
 				}
 			}
@@ -198,7 +198,7 @@ pub fn (mut s System) update(dt f64) {
 
 pub fn (mut s System) draw() {
 	mut p := &Particle(0)
-	//for mut p in s.pool {
+	// for mut p in s.pool {
 	for i := 0; i < s.pool.len; i++ {
 		p = s.pool[i]
 		if p.is_dead() || !p.is_ready() {
@@ -217,7 +217,7 @@ pub fn (mut s System) draw() {
 					}
 				}
 				else {
-					//eprintln('Painter type ${painter} not supported') // <- struct printing results in some C error
+					// eprintln('Painter type ${painter} not supported') // <- struct printing results in some C error
 					eprintln('Painter type not supported')
 				}
 			}
@@ -226,8 +226,8 @@ pub fn (mut s System) draw() {
 }
 
 pub fn (mut s System) reset() {
-	eprintln(@MOD+'.'+@STRUCT+'::'+@FN)
-	eprintln('Resetting ${s.pool.len} from pool ${s.bin.len}')
+	eprintln(@MOD + '.' + @STRUCT + '::' + @FN)
+	eprintln('Resetting $s.pool.len from pool $s.bin.len')
 	for p in s.pool {
 		mut pm := p
 		pm.reset()
@@ -241,34 +241,32 @@ pub fn (mut s System) reset() {
 }
 
 pub fn (mut s System) free() {
-
 	for key, image in s.image_cache {
-		eprintln('Freeing ${key} from image cache')
+		eprintln('Freeing $key from image cache')
 		mut im := image
 		im.free()
 	}
-	eprintln('Freeing ${s.pool.len} from pool')
+	eprintln('Freeing $s.pool.len from pool')
 	for p in s.pool {
 		if p == 0 {
-			print(ptr_str(p)+' ouch')
+			print(ptr_str(p) + ' ouch')
 			continue
 		}
-		unsafe{
+		unsafe {
 			p.free()
 		}
 	}
 	s.pool.clear()
 
-	eprintln('Freeing ${s.bin.len} from bin')
+	eprintln('Freeing $s.bin.len from bin')
 	for p in s.bin {
-
 		if p == 0 {
-			eprint(ptr_str(p)+' ouch')
+			eprint(ptr_str(p) + ' ouch')
 			continue
 		}
 
-		unsafe{
-			//println('Freeing from bin')
+		unsafe {
+			// println('Freeing from bin')
 			p.free()
 		}
 	}
