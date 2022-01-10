@@ -184,14 +184,14 @@ pub fn (v Vec2) eq_epsilon(u Vec2) bool {
 
 // eq_approx will return a bool indicating if vectors are approximately equal within the tolerance
 pub fn (v Vec2) eq_approx(u Vec2, tolerance f64) bool {
-	diff_x := math.fabs(v.x - u.x)
-	diff_y := math.fabs(v.y - u.y)
+	diff_x := math.abs(v.x - u.x)
+	diff_y := math.abs(v.y - u.y)
 	if diff_x <= tolerance && diff_y <= tolerance {
 		return true
 	}
 
-	max_x := math.max(math.fabs(v.x), math.fabs(u.x))
-	max_y := math.max(math.fabs(v.y), math.fabs(u.y))
+	max_x := math.max(math.abs(v.x), math.abs(u.x))
+	max_y := math.max(math.abs(v.y), math.abs(u.y))
 	if diff_x < max_x * tolerance && diff_y < max_y * tolerance {
 		return true
 	}
@@ -201,7 +201,7 @@ pub fn (v Vec2) eq_approx(u Vec2, tolerance f64) bool {
 
 // is_approx_zero will return a bool indicating if this vector is zero within tolerance
 pub fn (v Vec2) is_approx_zero(tolerance f64) bool {
-	if math.fabs(v.x) <= tolerance && math.fabs(v.y) <= tolerance {
+	if math.abs(v.x) <= tolerance && math.abs(v.y) <= tolerance {
 		return true
 	}
 	return false
@@ -224,7 +224,7 @@ pub fn (v Vec2) distance(u Vec2) f64 {
 
 // manhattan_distance returns the Manhattan distance between the two vectors
 pub fn (v Vec2) manhattan_distance(u Vec2) f64 {
-	return math.fabs(v.x-u.x) + math.fabs(v.y-u.y)
+	return math.abs(v.x-u.x) + math.abs(v.y-u.y)
 }
 
 // angle_between returns the angle in radians between the two vectors
@@ -240,10 +240,10 @@ pub fn (v Vec2) angle() f64 {
 // abs will set x and y values to their absolute values
 pub fn (mut v Vec2) abs() {
 	if v.x < 0 {
-		v.x = math.fabs(v.x)
+		v.x = math.abs(v.x)
 	}
 	if v.y < 0 {
-		v.y = math.fabs(v.y)
+		v.y = math.abs(v.y)
 	}
 }
 
