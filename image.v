@@ -4,6 +4,7 @@ import os
 
 import particle.c
 
+import sokol.gfx
 import stbi
 
 pub const (
@@ -38,10 +39,8 @@ mut:
 	data		voidptr
 	ext			string
 
-	sg_image	C.sg_image
+	sg_image	gfx.Image
 }
-
-//fn C.sg_isvalid() bool
 
 pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 	eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' loading "${opt.path}" ...')
@@ -90,6 +89,7 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 
 	//stb_img := stbi.load(opt.path) or { return err }
 
+	eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' loading $buffer.len bytes from memory ...')
 	stb_img := stbi.load_from_memory(buffer.data, buffer.len) or {
 		return error(@MOD+'.'+@FN+' stbi failed loading "$image_path"')
 	}
@@ -113,7 +113,7 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 	img.init_sokol_image()
 	//stb_img.free() // TODO ??
 
-	if img.cache && !(uid in s.image_cache) {
+	if img.cache && !(uid in s.image_cache.keys()) {
 		eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' caching "$uid"')
 		s.image_cache[uid] = img
 	}
@@ -122,11 +122,11 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 }
 
 pub fn (mut img Image) init_sokol_image() &Image {
-	//eprintln('\n init sokol image $img.path ok=$img.sg_image_ok')
-	mut img_desc := C.sg_image_desc{
+	eprintln(@MOD+'.'+@STRUCT+'::'+@FN+' init sokol image $img')
+	mut img_desc := gfx.ImageDesc{
 		width: img.width
 		height: img.height
-		num_mipmaps: img.mipmaps
+		//num_mipmaps: img.mipmaps
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
 		label: &byte(0)
@@ -134,16 +134,17 @@ pub fn (mut img Image) init_sokol_image() &Image {
 		pixel_format: .rgba8 // C.SG_PIXELFORMAT_RGBA8
 	}
 
-	img_desc.data.subimage[0][0]  = C.sg_range{
+	img_desc.data.subimage[0][0]  = gfx.Range{
 		ptr: img.data
 		size: usize(img.channels * img.width * img.height)
 	}
 
-	if img.mipmaps <= 0 {
-		img.sg_image = C.sg_make_image(&img_desc)
-	} else {
-		img.sg_image = C.sg_make_image_with_mipmaps(&img_desc)
-	}
+	//if img.mipmaps <= 0 {
+		img.sg_image = gfx.make_image(&img_desc)
+	//}
+	// else {
+	//	img.sg_image = C.sg_make_image_with_mipmaps(&img_desc)
+	//}
 	return img
 }
 
