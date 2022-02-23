@@ -136,7 +136,7 @@ fn (mut e Emitter) emit() {
 
 		p.life_time = e.life_time
 		if e.life_time_variation != 0.0 {
-			p.life_time += rand.f32_in_range(-e.life_time_variation, e.life_time_variation)
+			p.life_time += rand.f32_in_range(-e.life_time_variation, e.life_time_variation) or { -e.life_time_variation }
 		}
 		p.size = e.start_size
 		p.end.size = e.end_size
@@ -145,13 +145,13 @@ fn (mut e Emitter) emit() {
 			sv.abs()
 			if e.emit_size_keep_aspect {
 				sv_aspect := math.max(sv.x, sv.y)
-				p.size.plus_f64(rand.f64_in_range(-sv_aspect, sv_aspect))
+				p.size.plus_f64(rand.f64_in_range(-sv_aspect, sv_aspect) or { -sv_aspect })
 			} else {
 				if sv.x > 0 {
-					p.size.x += rand.f64_in_range(-sv.x, sv.x)
+					p.size.x += rand.f64_in_range(-sv.x, sv.x) or { -sv.x }
 				}
 				if sv.y > 0 {
-					p.size.y += rand.f64_in_range(-sv.y, sv.y)
+					p.size.y += rand.f64_in_range(-sv.y, sv.y) or { -sv.y }
 				}
 			}
 		}
@@ -178,10 +178,10 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2, sd StochasticDirec
 				mut pv := sd.point_variation + vec.Vec2{0, 0} //.copy()
 				pv.abs()
 				if pv.x > 0 {
-					v.x += rand.f64_in_range(-pv.x, pv.x)
+					v.x += rand.f64_in_range(-pv.x, pv.x) or { -pv.x }
 				}
 				if pv.y > 0 {
-					v.y += rand.f64_in_range(-pv.y, pv.y)
+					v.y += rand.f64_in_range(-pv.y, pv.y) or { -pv.y }
 				}
 			}
 
@@ -203,12 +203,12 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2, sd StochasticDirec
 			mut angle := sd.angle
 			if sd.angle_variation != 0.0 {
 				av := math.abs(sd.angle_variation)
-				angle += f32(rand.f64_in_range(-av, av))
+				angle += f32(rand.f64_in_range(-av, av) or { -av })
 			}
 			mut magnitude := sd.magnitude
 			if sd.magnitude_variation != 0.0 {
 				mv := math.abs(sd.magnitude_variation)
-				magnitude += f32(rand.f64_in_range(-mv, mv))
+				magnitude += f32(rand.f64_in_range(-mv, mv) or { -mv })
 			}
 			v.x = magnitude * math.cos(math.radians(angle))
 			v.y = magnitude * math.sin(math.radians(angle))
@@ -219,10 +219,10 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2, sd StochasticDirec
 				mut tv := sd.target_variation + vec.Vec2{0, 0} // .copy()
 				tv.abs()
 				if tv.x > 0 {
-					target.x += rand.f64_in_range(-tv.x, tv.x)
+					target.x += rand.f64_in_range(-tv.x, tv.x) or { -tv.x }
 				}
 				if tv.y > 0 {
-					target.y += rand.f64_in_range(-tv.y, tv.y)
+					target.y += rand.f64_in_range(-tv.y, tv.y) or { -tv.y }
 				}
 			}
 			mut angle_rad := f64(0)
@@ -236,7 +236,7 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2, sd StochasticDirec
 			}
 			if sd.magnitude_variation != 0.0 {
 				mv := math.abs(sd.magnitude_variation)
-				magnitude += f32(rand.f64_in_range(-mv, mv))
+				magnitude += f32(rand.f64_in_range(-mv, mv) or { -mv })
 			}
 			v.x = magnitude * math.cos(angle_rad)
 			v.y = magnitude * math.sin(angle_rad)

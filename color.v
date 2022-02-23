@@ -27,16 +27,16 @@ fn (mut c Color) variation(cv ColorVariation) {
 		return
 	}
 	if cv.r > 0 {
-		c.r = byte(c.r * (1 - cv.r) + rand.f32_in_range(0, 255) * cv.r)
+		c.r = byte(c.r * (1 - cv.r) + rand.f32_in_range(0, 255) or { 255 } * cv.r)
 	}
 	if cv.g > 0 {
-		c.g = byte(c.g * (1 - cv.g) + rand.f32_in_range(0, 255) * cv.g)
+		c.g = byte(c.g * (1 - cv.g) + rand.f32_in_range(0, 255) or { 0 } * cv.g)
 	}
 	if cv.b > 0 {
-		c.b = byte(c.b * (1 - cv.b) + rand.f32_in_range(0, 255) * cv.b)
+		c.b = byte(c.b * (1 - cv.b) + rand.f32_in_range(0, 255) or { 0 } * cv.b)
 	}
 	if cv.a > 0 {
-		c.a = byte(c.a * (1 - cv.a) + rand.f32_in_range(0, 255) * cv.a)
+		c.a = byte(c.a * (1 - cv.a) + rand.f32_in_range(0, 255) or { 255 } * cv.a)
 	}
 }
 
