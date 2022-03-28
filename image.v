@@ -1,13 +1,8 @@
 module particle
 
 import os
-import particle.c
 import sokol.gfx
 import stbi
-
-pub const (
-	used_import = c.used_import
-)
 
 pub struct ImageOptions {
 mut:
@@ -44,7 +39,7 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 	eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading "$opt.path" ...')
 	// eprintln('${opt}')
 	/*
-	if !C.sg_isvalid() {
+	if !gfx.isvalid() {
 		// Sokol is not initialized yet, add stbi object to a queue/cache
 		//s.image_queue << path
 		stb_img := stbi.load(path) or { return Image{} }
@@ -125,7 +120,6 @@ pub fn (mut img Image) init_sokol_image() &Image {
 	mut img_desc := gfx.ImageDesc{
 		width: img.width
 		height: img.height
-		// num_mipmaps: img.mipmaps
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
 		label: &byte(0)
@@ -138,18 +132,13 @@ pub fn (mut img Image) init_sokol_image() &Image {
 		size: usize(img.channels * img.width * img.height)
 	}
 
-	// if img.mipmaps <= 0 {
 	img.sg_image = gfx.make_image(&img_desc)
-	//}
-	// else {
-	//	img.sg_image = C.sg_make_image_with_mipmaps(&img_desc)
-	//}
 	return img
 }
 
 pub fn (mut img Image) free() {
 	unsafe {
-		C.sg_destroy_image(img.sg_image)
+		gfx.destroy_image(img.sg_image)
 		C.stbi_image_free(img.data)
 	}
 }

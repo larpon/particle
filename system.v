@@ -1,4 +1,4 @@
-// Copyright(C) 2020 Lars Pontoppidan. All rights reserved.
+// Copyright(C) 2020-2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license file distributed with this software package
 
 module particle
@@ -32,6 +32,14 @@ mut:
 }
 
 pub fn (mut s System) init(sc SystemConfig) {
+	// OPTIMISATIONS
+	// .noslices - tells the compiler that we're 100% sure that
+	//  the pool array is *never* sliced (E.g. ps := s.pool[2..6])
+	//
+	// .noshrink - tells the compiler that we do not want
+	//  delete operations on the array to reallocate memory - this breaks the idea of using a pool in the first place
+	unsafe { s.pool.flags.set(.noslices | .noshrink) }
+	unsafe { s.bin.flags.set(.noslices | .noshrink) }
 	$if debug {
 		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' creating $sc.pool particles.')
 	}
@@ -54,8 +62,9 @@ pub fn (mut s System) init(sc SystemConfig) {
 	}
 }
 
-pub fn (mut s System) add(c Component) {
+pub fn (mut s System) add(cp Component) {
 	// eprintln('Adding something')
+	mut c := cp
 	match mut c {
 		Emitter {
 			eprintln('Adding emitter')

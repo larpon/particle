@@ -1,4 +1,4 @@
-// Copyright(C) 2020 Lars Pontoppidan. All rights reserved.
+// Copyright(C) 2020-2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license file distributed with this software package
 
 module particle
@@ -12,24 +12,24 @@ const (
 )
 
 pub fn (mut s System) new_particle() &Particle {
-	ip := &Particle{
-		init: 0
-		end: 0
-		system: s
+	ip := ParticleState{
+		// init: particle.null
+		// end: particle.null
+		// system: s
 		position: vec.Vec2{0, 0}
 		velocity: vec.Vec2{0, 0}
 		acceleration: vec.Vec2{0, 0}
-		size: default_size
+		size: particle.default_size
 		rotation: 0
 		scale: 1
-		color: default_color
-		life_time: default_life_time
+		color: particle.default_color
+		life_time: particle.default_life_time
 	}
 
-	ep := &Particle{
-		init: 0
-		end: 0
-		system: s
+	ep := ParticleState{
+		// init: particle.null
+		// end: particle.null
+		// system: s
 		position: ip.position
 		velocity: ip.velocity
 		acceleration: ip.acceleration
@@ -41,9 +41,10 @@ pub fn (mut s System) new_particle() &Particle {
 	}
 
 	p := &Particle{
+		system: s
 		init: ip
 		end: ep
-		system: s
+		//
 		position: ip.position
 		velocity: ip.velocity
 		acceleration: ip.acceleration
@@ -56,6 +57,24 @@ pub fn (mut s System) new_particle() &Particle {
 	return p
 }
 
+pub struct ParticleState {
+mut:
+	position     vec.Vec2
+	velocity     vec.Vec2
+	acceleration vec.Vec2
+	size         vec.Vec2
+	rotation     f32
+	scale        f32
+	color        Color
+	life_time    f32
+}
+
+fn (p ParticleState) eq(pa ParticleState) bool {
+	return p.position.eq(pa.position) && p.velocity.eq(pa.velocity)
+		&& p.acceleration.eq(pa.acceleration) && p.size.eq(pa.size) && p.rotation == pa.rotation
+		&& p.scale == pa.scale && p.color.eq(pa.color) && p.life_time == pa.life_time
+}
+
 /*
 * Particle
 */
@@ -64,23 +83,20 @@ pub struct Particle {
 mut:
 	system &System
 	// mut:
-	init         &Particle
-	end          &Particle
+	init      ParticleState
+	end       ParticleState
+	group     string
+	need_init bool
+	// State
 	position     vec.Vec2
 	velocity     vec.Vec2
 	acceleration vec.Vec2
 	size         vec.Vec2
-
-	rotation f32
-	scale    f32
-
-	color Color
-
-	group string
-
-	life_time f32
-
-	need_init bool
+	rotation     f32
+	scale        f32
+	color        Color
+	life_time    f32
+	//
 }
 
 pub fn (mut p Particle) set_init() {
@@ -95,14 +111,14 @@ pub fn (mut p Particle) set_init() {
 	p.need_init = true
 }
 
-fn (p Particle) eq(pa Particle) bool {
-	return p.position.eq(pa.position) && p.velocity.eq(pa.velocity)
-		&& p.acceleration.eq(pa.acceleration) && p.size.eq(pa.size) && p.rotation == pa.rotation
-		&& p.scale == pa.scale && p.color.eq(pa.color) && p.life_time == pa.life_time
+fn (p Particle) has_state(ps ParticleState) bool {
+	return p.position.eq(ps.position) && p.velocity.eq(ps.velocity)
+		&& p.acceleration.eq(ps.acceleration) && p.size.eq(ps.size) && p.rotation == ps.rotation
+		&& p.scale == ps.scale && p.color.eq(ps.color) && p.life_time == ps.life_time
 }
 
 pub fn (p Particle) is_ready() bool {
-	return !p.init.eq(p)
+	return !p.has_state(p.init)
 }
 
 pub fn (mut p Particle) update(dt f64) {
@@ -138,12 +154,12 @@ pub fn (mut p Particle) reset() {
 	p.position.zero()
 	p.acceleration.zero()
 	p.velocity.zero()
-	p.color = default_color
+	p.color = particle.default_color
 
 	p.rotation = 0
 	p.scale = 1
 
-	p.life_time = default_life_time
+	p.life_time = particle.default_life_time
 
 	p.set_init()
 }

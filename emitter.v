@@ -1,4 +1,4 @@
-// Copyright(C) 2020 Lars Pontoppidan. All rights reserved.
+// Copyright(C) 2020-2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license file distributed with this software package
 
 module particle
@@ -136,7 +136,9 @@ fn (mut e Emitter) emit() {
 
 		p.life_time = e.life_time
 		if e.life_time_variation != 0.0 {
-			p.life_time += rand.f32_in_range(-e.life_time_variation, e.life_time_variation) or { -e.life_time_variation }
+			p.life_time += rand.f32_in_range(-e.life_time_variation, e.life_time_variation) or {
+				-e.life_time_variation
+			}
 		}
 		p.size = e.start_size
 		p.end.size = e.end_size
