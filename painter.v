@@ -36,9 +36,9 @@ fn (mut rp RectPainter) init(mut p Particle) {
 fn (rp RectPainter) draw(mut p Particle) {
 	fast := p.rotation == 0 && p.scale == 1
 
-	p.color.a = byte(p.init.color.a * remap(p.life_time, p.init.life_time, p.end.life_time,
+	p.color.a = u8(p.init.color.a * remap(p.life_time, p.init.life_time, p.end.life_time,
 		1, 0))
-	// p.color.a = byte(remap(p.life_time, p.init.life_time, p.end.life_time, 255, 0))
+	// p.color.a = u8(remap(p.life_time, p.init.life_time, p.end.life_time, 255, 0))
 
 	// if p.color.eq(default_color) {
 	//	println('${p.life_time}/${p.init.life_time}')
@@ -128,7 +128,7 @@ fn (mut ip ImagePainter) draw(mut p Particle) {
 		) or { panic(err) }
 	}
 
-	p.color.a = byte(p.init.color.a * remap(p.life_time, p.init.life_time, p.end.life_time,
+	p.color.a = u8(p.init.color.a * remap(p.life_time, p.init.life_time, p.end.life_time,
 		1, 0))
 
 	u0 := f32(0.0)

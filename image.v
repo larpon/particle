@@ -58,7 +58,7 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 	}*/
 
 	mut image_path := opt.path
-	mut buffer := []byte{}
+	mut buffer := []u8{}
 	$if android {
 		image_path = image_path.replace('assets/', '') // TODO
 		buffer = os.read_apk_asset(image_path) or {
@@ -122,7 +122,7 @@ pub fn (mut img Image) init_sokol_image() &Image {
 		height: img.height
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
-		label: &byte(0)
+		label: &u8(0)
 		d3d11_texture: 0
 		pixel_format: .rgba8 // C.SG_PIXELFORMAT_RGBA8
 	}
