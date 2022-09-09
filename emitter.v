@@ -40,7 +40,7 @@ pub mut:
 mut:
 	position_last_frame vec.Vec2
 
-	system  &System = 0
+	system  &System = unsafe { nil }
 	dt      f64   // current delta time this frame
 	elapsed f32 // Elapsed time accumulator
 

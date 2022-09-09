@@ -238,12 +238,12 @@ pub fn (mut s System) reset() {
 	eprintln(@MOD + '.' + @STRUCT + '::' + @FN)
 	eprintln('Resetting $s.pool.len from pool $s.bin.len')
 	for p in s.pool {
-		mut pm := p
+		mut pm := unsafe { p }
 		pm.reset()
 		pm.life_time = 0
 	}
 	for p in s.bin {
-		mut pm := p
+		mut pm := unsafe { p }
 		pm.reset()
 		pm.life_time = 0
 	}
@@ -257,7 +257,7 @@ pub fn (mut s System) free() {
 	}
 	eprintln('Freeing $s.pool.len from pool')
 	for p in s.pool {
-		if p == 0 {
+		if isnil(p) {
 			print(ptr_str(p) + ' ouch')
 			continue
 		}
@@ -269,7 +269,7 @@ pub fn (mut s System) free() {
 
 	eprintln('Freeing $s.bin.len from bin')
 	for p in s.bin {
-		if p == 0 {
+		if isnil(p) {
 			eprint(ptr_str(p) + ' ouch')
 			continue
 		}

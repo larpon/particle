@@ -31,7 +31,7 @@ mut:
 
 	last i64
 
-	ps        &particle.System = 0
+	ps        &particle.System = unsafe { nil }
 	alpha_pip sgl.Pipeline
 }
 
