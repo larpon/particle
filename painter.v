@@ -119,7 +119,7 @@ fn (mut ip ImagePainter) init(mut p Particle) {
 
 fn (mut ip ImagePainter) draw(mut p Particle) {
 	if !ip.image.ready {
-		eprintln('Loading image "$ip.path" on demand')
+		eprintln('Loading image "${ip.path}" on demand')
 		num_mipmap := if ip.mipmap { 4 } else { 0 } // TODO find good trade-off value
 		ip.image = p.system.load_image(
 			path: ip.path

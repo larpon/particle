@@ -36,7 +36,7 @@ mut:
 }
 
 pub fn (mut s System) load_image(opt ImageOptions) ?Image {
-	eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading "$opt.path" ...')
+	eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading "${opt.path}" ...')
 	// eprintln('${opt}')
 	/*
 	if !gfx.isvalid() {
@@ -62,30 +62,30 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 	$if android {
 		image_path = image_path.replace('assets/', '') // TODO
 		buffer = os.read_apk_asset(image_path) or {
-			return error(@MOD + '.' + @FN + ' (Android) file "$image_path" not found')
+			return error(@MOD + '.' + @FN + ' (Android) file "${image_path}" not found')
 		}
 	} $else {
 		if !os.is_file(image_path) {
-			return error(@MOD + '.' + @FN + ' file "$image_path" not found')
+			return error(@MOD + '.' + @FN + ' file "${image_path}" not found')
 			// return none
 		}
 		image_path = os.real_path(image_path)
 		buffer = os.read_bytes(image_path) or {
-			return error(@MOD + '.' + @FN + ' file "$image_path" could not be read')
+			return error(@MOD + '.' + @FN + ' file "${image_path}" could not be read')
 		}
 	}
 
 	uid := image_path // os.real_path(image_path)
 	if uid in s.image_cache {
-		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading "$image_path" from cache')
+		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading "${image_path}" from cache')
 		return s.image_cache[uid]
 	}
 
 	// stb_img := stbi.load(opt.path) or { return err }
 
-	eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading $buffer.len bytes from memory ...')
+	eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' loading ${buffer.len} bytes from memory ...')
 	stb_img := stbi.load_from_memory(buffer.data, buffer.len) or {
-		return error(@MOD + '.' + @FN + ' stbi failed loading "$image_path"')
+		return error(@MOD + '.' + @FN + ' stbi failed loading "${image_path}"')
 	}
 
 	mut img := Image{
@@ -108,7 +108,7 @@ pub fn (mut s System) load_image(opt ImageOptions) ?Image {
 	// stb_img.free() // TODO ??
 
 	if img.cache && uid !in s.image_cache.keys() {
-		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' caching "$uid"')
+		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' caching "${uid}"')
 		s.image_cache[uid] = img
 	}
 

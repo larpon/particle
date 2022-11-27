@@ -41,14 +41,14 @@ pub fn (mut s System) init(sc SystemConfig) {
 	unsafe { s.pool.flags.set(.noslices | .noshrink) }
 	unsafe { s.bin.flags.set(.noslices | .noshrink) }
 	$if debug {
-		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' creating $sc.pool particles.')
+		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' creating ${sc.pool} particles.')
 	}
 	for i := 0; i < sc.pool; i++ {
 		p := s.new_particle()
 		s.bin << p
 	}
 	$if debug {
-		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' created $sc.pool particles.')
+		eprintln(@MOD + '.' + @STRUCT + '::' + @FN + ' created ${sc.pool} particles.')
 	}
 
 	if s.painters.len == 0 {
@@ -236,7 +236,7 @@ pub fn (mut s System) draw() {
 
 pub fn (mut s System) reset() {
 	eprintln(@MOD + '.' + @STRUCT + '::' + @FN)
-	eprintln('Resetting $s.pool.len from pool $s.bin.len')
+	eprintln('Resetting ${s.pool.len} from pool ${s.bin.len}')
 	for p in s.pool {
 		mut pm := unsafe { p }
 		pm.reset()
@@ -251,11 +251,11 @@ pub fn (mut s System) reset() {
 
 pub fn (mut s System) free() {
 	for key, image in s.image_cache {
-		eprintln('Freeing $key from image cache')
+		eprintln('Freeing ${key} from image cache')
 		mut im := image
 		im.free()
 	}
-	eprintln('Freeing $s.pool.len from pool')
+	eprintln('Freeing ${s.pool.len} from pool')
 	for p in s.pool {
 		if isnil(p) {
 			print(ptr_str(p) + ' ouch')
@@ -267,7 +267,7 @@ pub fn (mut s System) free() {
 	}
 	s.pool.clear()
 
-	eprintln('Freeing $s.bin.len from bin')
+	eprintln('Freeing ${s.bin.len} from bin')
 	for p in s.bin {
 		if isnil(p) {
 			eprint(ptr_str(p) + ' ouch')
