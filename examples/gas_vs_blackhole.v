@@ -191,7 +191,7 @@ fn (mut a App) init() {
 }
 
 fn (mut a App) cleanup() {
-	eprintln(@MOD + '.' + @STRUCT + '::' + @FN + '')
+	eprintln('${@MOD}.${@STRUCT}::${@FN}')
 	a.ps.free()
 	unsafe {
 		free(a.ps)
@@ -200,7 +200,7 @@ fn (mut a App) cleanup() {
 }
 
 fn cleanup(user_data voidptr) {
-	mut app := &App(user_data)
+	mut app := unsafe { &App(user_data) }
 	app.cleanup()
 	gfx.shutdown()
 }
@@ -228,7 +228,7 @@ fn (mut a App) draw() {
 }
 
 fn init(user_data voidptr) {
-	mut app := &App(user_data)
+	mut app := unsafe { &App(user_data) }
 
 	desc := gfx.Desc{}
 
@@ -258,7 +258,7 @@ fn init(user_data voidptr) {
 }
 
 fn frame(user_data voidptr) {
-	mut app := &App(user_data)
+	mut app := unsafe { &App(user_data) }
 
 	app.width = sapp.width()
 	app.height = sapp.height()
@@ -286,7 +286,7 @@ fn frame(user_data voidptr) {
 }
 
 fn event(ev &sapp.Event, user_data voidptr) {
-	mut app := &App(user_data)
+	mut app := unsafe { &App(user_data) }
 
 	mut emitter := app.ps.get_emitter(0)
 	// mut emitter1 := app.ps.get_emitter(1)
