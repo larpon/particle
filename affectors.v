@@ -3,7 +3,7 @@
 
 module particle
 
-import particle.vec
+import math.vec
 import math
 
 enum PhysicsType {
@@ -31,8 +31,8 @@ pub struct GravityAffector {
 pub mut:
 	enabled bool
 
-	position vec.Vec2 // Center position of the affector
-	size     vec.Vec2 // Max size of the affector
+	position vec.Vec2[f64] // Center position of the affector
+	size     vec.Vec2[f64] // Max size of the affector
 
 	groups []string // Leave empty to affect all particles
 
@@ -80,7 +80,7 @@ pub struct AttractorAffector {
 pub mut:
 	enabled bool
 
-	position vec.Vec2 // Center position of the affector
+	position vec.Vec2[f64] // Center position of the affector
 	strength f32
 
 	groups []string // Leave empty to affect all particles

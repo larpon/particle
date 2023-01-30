@@ -3,10 +3,10 @@
 
 module particle
 
-import particle.vec
+import math.vec
 
 const (
-	default_size      = vec.Vec2{6, 6}
+	default_size      = vec.Vec2[f64]{6, 6}
 	default_life_time = 1000.0
 	default_color     = Color{255, 255, 255, 255}
 )
@@ -16,9 +16,9 @@ pub fn (mut s System) new_particle() &Particle {
 		// init: particle.null
 		// end: particle.null
 		// system: s
-		position: vec.Vec2{0, 0}
-		velocity: vec.Vec2{0, 0}
-		acceleration: vec.Vec2{0, 0}
+		position: vec.Vec2[f64]{0, 0}
+		velocity: vec.Vec2[f64]{0, 0}
+		acceleration: vec.Vec2[f64]{0, 0}
 		size: particle.default_size
 		rotation: 0
 		scale: 1
@@ -59,10 +59,10 @@ pub fn (mut s System) new_particle() &Particle {
 
 pub struct ParticleState {
 mut:
-	position     vec.Vec2
-	velocity     vec.Vec2
-	acceleration vec.Vec2
-	size         vec.Vec2
+	position     vec.Vec2[f64]
+	velocity     vec.Vec2[f64]
+	acceleration vec.Vec2[f64]
+	size         vec.Vec2[f64]
 	rotation     f32
 	scale        f32
 	color        Color
@@ -88,10 +88,10 @@ mut:
 	group     string
 	need_init bool
 	// State
-	position     vec.Vec2
-	velocity     vec.Vec2
-	acceleration vec.Vec2
-	size         vec.Vec2
+	position     vec.Vec2[f64]
+	velocity     vec.Vec2[f64]
+	acceleration vec.Vec2[f64]
+	size         vec.Vec2[f64]
 	rotation     f32
 	scale        f32
 	color        Color
@@ -123,7 +123,7 @@ pub fn (p Particle) is_ready() bool {
 
 pub fn (mut p Particle) update(dt f64) {
 	mut acc := p.acceleration
-	acc.multiply_f64(dt)
+	acc.multiply_scalar(dt)
 	p.velocity = p.velocity.add(acc)
 	p.position = p.position.add(p.velocity)
 

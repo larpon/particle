@@ -51,11 +51,11 @@ fn (mut a App) init() {
 		//enabled: false
 		rate: 200
 		velocity: particle.PointDirection{
-			point_variation: vec.Vec2{0.5,0.5}
+			point_variation: vec.Vec2[f64]{0.5,0.5}
 		}
 		acceleration: particle.PointDirection{
-			//point: vec.Vec2{0.1,5}
-			point_variation: vec.Vec2{0.7,0.7}
+			//point: vec.Vec2[f64]{0.1,5}
+			point_variation: vec.Vec2[f64]{0.7,0.7}
 		}
 		life_time: 4000
 		life_time_variation: 2000
@@ -64,18 +64,18 @@ fn (mut a App) init() {
 	}
 	a.ps.add(e)
 
-	bottom_right := vec.Vec2{f64(a.width),f64(a.height)}
+	bottom_right := vec.Vec2[f64]{f64(a.width),f64(a.height)}
 
-	vwhdiv6 := vec.Vec2{f64(a.width)/6,f64(a.height)/6}
+	vwhdiv6 := vec.Vec2[f64]{f64(a.width)/6,f64(a.height)/6}
 	e1 := particle.Emitter{
 		enabled: true
 		position: vwhdiv6
 		rate: 10
 		velocity: particle.PointDirection{
-			point_variation: vec.Vec2{0.5,0.5}
+			point_variation: vec.Vec2[f64]{0.5,0.5}
 		}
 		acceleration: particle.PointDirection{
-			point_variation: vec.Vec2{0.7,0.7}
+			point_variation: vec.Vec2[f64]{0.7,0.7}
 		}
 		life_time: 2000
 		life_time_variation: 4000
@@ -84,7 +84,7 @@ fn (mut a App) init() {
 
 	e2 := particle.Emitter{
 		enabled: true
-		position: vec.Vec2{vwhdiv6.x*2,vwhdiv6.y}
+		position: vec.Vec2[f64]{vwhdiv6.x*2,vwhdiv6.y}
 		rate: 4.5
 		velocity: particle.AngleDirection{
 			angle: -90
@@ -105,17 +105,17 @@ fn (mut a App) init() {
 
 	e3 := particle.Emitter{
 		enabled: true
-		position: vec.Vec2{vwhdiv6.x*3,vwhdiv6.y}
+		position: vec.Vec2[f64]{vwhdiv6.x*3,vwhdiv6.y}
 		rate: 4.5
 		velocity: particle.TargetDirection {
 			target:					bottom_right
-			target_variation:		vec.Vec2{0.5,0.5}
+			target_variation:		vec.Vec2[f64]{0.5,0.5}
 			magnitude:				5
 			magnitude_variation:	2
 		}
 		acceleration: particle.TargetDirection {
 			target:					bottom_right
-			target_variation:		vec.Vec2{bottom_right.x*0.2,bottom_right.y*0.2}
+			target_variation:		vec.Vec2[f64]{bottom_right.x*0.2,bottom_right.y*0.2}
 			magnitude:				5
 			magnitude_variation:	0.5
 		}

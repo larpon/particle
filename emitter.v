@@ -5,21 +5,21 @@ module particle
 
 import math
 import rand
-import particle.vec
+import math.vec
 
 pub struct Emitter {
 pub mut:
 	enabled bool
 
-	position vec.Vec2 // Center position of the emitter
-	size     vec.Vec2 // Max size of the emitter
+	position vec.Vec2[f64] // Center position of the emitter
+	size     vec.Vec2[f64] // Max size of the emitter
 
 	velocity     StochasticDirection
 	acceleration StochasticDirection
 
-	start_size            vec.Vec2 = default_size // Emitted particles start their life in this size
-	end_size              vec.Vec2 // Emitted particles end their life in this size
-	size_variation        vec.Vec2 // Particle size will vary up/down to a maximum of this value
+	start_size            vec.Vec2[f64] = default_size // Emitted particles start their life in this size
+	end_size              vec.Vec2[f64] // Emitted particles end their life in this size
+	size_variation        vec.Vec2[f64] // Particle size will vary up/down to a maximum of this value
 	emit_size_keep_aspect bool = true
 
 	life_time           f32 = 1000 // How long the particles emitted will last
@@ -38,19 +38,19 @@ pub mut:
 	movement_velocity      f32
 	movement_velocity_flip bool
 mut:
-	position_last_frame vec.Vec2
+	position_last_frame vec.Vec2[f64]
 
 	system  &System = unsafe { nil }
 	dt      f64   // current delta time this frame
 	elapsed f32 // Elapsed time accumulator
 
-	burst_position vec.Vec2 // Center position of the burst
+	burst_position vec.Vec2[f64] // Center position of the burst
 	burst_amount   int
 	pulse_duration int
 }
 
 /*
-pub fn (mut e Emitter) move_to(v vec.Vec2) {
+pub fn (mut e Emitter) move_to(v vec.Vec2[f64]) {
 	e.position.from(v)
 }*/
 
@@ -58,7 +58,7 @@ pub fn (mut e Emitter) burst(amount int) {
 	e.burst_amount = amount
 }
 
-pub fn (mut e Emitter) burst_at(amount int, position vec.Vec2) {
+pub fn (mut e Emitter) burst_at(amount int, position vec.Vec2[f64]) {
 	e.burst_position.from(position)
 	e.burst(amount)
 }
@@ -124,7 +124,7 @@ fn (mut e Emitter) emit() {
 
 		p.group = e.group
 
-		if bursting && !e.burst_position.eq_f64(0.0) {
+		if bursting && !e.burst_position.eq_scalar(0.0) {
 			p.position.from(e.burst_position)
 			e.position_last_frame.from(p.position) // Stop movement_velocity this frame
 		} else {
@@ -142,12 +142,12 @@ fn (mut e Emitter) emit() {
 		}
 		p.size = e.start_size
 		p.end.size = e.end_size
-		if !e.size_variation.eq_f64(0.0) {
+		if !e.size_variation.eq_scalar(0.0) {
 			mut sv := e.size_variation.copy()
 			sv.abs()
 			if e.emit_size_keep_aspect {
 				sv_aspect := math.max(sv.x, sv.y)
-				p.size.plus_f64(rand.f64_in_range(-sv_aspect, sv_aspect) or { -sv_aspect })
+				p.size.plus_scalar(rand.f64_in_range(-sv_aspect, sv_aspect) or { -sv_aspect })
 			} else {
 				if sv.x > 0 {
 					p.size.x += rand.f64_in_range(-sv.x, sv.x) or { -sv.x }
@@ -171,13 +171,13 @@ fn (mut e Emitter) emit() {
 	}
 }
 
-fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2, sd StochasticDirection) {
+fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2[f64], sd StochasticDirection) {
 	match sd {
 		PointDirection {
 			v.from(sd.point)
 
-			if !sd.point_variation.eq_f64(0.0) {
-				mut pv := sd.point_variation + vec.Vec2{0, 0} //.copy()
+			if !sd.point_variation.eq_scalar(0.0) {
+				mut pv := sd.point_variation + vec.Vec2[f64]{0, 0} //.copy()
 				pv.abs()
 				if pv.x > 0 {
 					v.x += rand.f64_in_range(-pv.x, pv.x) or { -pv.x }
@@ -217,8 +217,8 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2, sd StochasticDirec
 		}
 		TargetDirection {
 			mut target := e.position - sd.target
-			if !sd.target_variation.eq_f64(0.0) {
-				mut tv := sd.target_variation + vec.Vec2{0, 0} // .copy()
+			if !sd.target_variation.eq_scalar(0.0) {
+				mut tv := sd.target_variation + vec.Vec2[f64]{0, 0} // .copy()
 				tv.abs()
 				if tv.x > 0 {
 					target.x += rand.f64_in_range(-tv.x, tv.x) or { -tv.x }

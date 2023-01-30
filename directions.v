@@ -3,15 +3,15 @@
 
 module particle
 
-import particle.vec
+import math.vec
 
 // Stochastic direction types
 type StochasticDirection = AngleDirection | PointDirection | TargetDirection
 
 pub struct PointDirection {
 pub mut:
-	point           vec.Vec2
-	point_variation vec.Vec2 // Will vary up/down to a maximum of these values
+	point           vec.Vec2[f64]
+	point_variation vec.Vec2[f64] // Will vary up/down to a maximum of these values
 }
 
 pub struct AngleDirection {
@@ -25,8 +25,8 @@ pub mut:
 pub struct TargetDirection {
 pub mut:
 	// target_item			Item
-	target                 vec.Vec2
-	target_variation       vec.Vec2 // Will vary up/down to a maximum of these values
+	target                 vec.Vec2[f64]
+	target_variation       vec.Vec2[f64] // Will vary up/down to a maximum of these values
 	magnitude              f32
 	magnitude_variation    f32 // Will vary up/down to a maximum of this value
 	proportional_magnitude bool
